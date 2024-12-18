@@ -10,7 +10,7 @@
 Pour installer les dépendances nécessaires, exécutez la commande suivante :
 
 ```bash
-npm install
+npm install -dev
 ```
 
 ---

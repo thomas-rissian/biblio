@@ -1,21 +1,23 @@
 /**
  * Représente un livre.
  */
-class Book {
+export class Book {
     #id = null;
     #title = null;
-    #author = null;
+    #authorId = null;
     #publicationDate = null;
     #description = null;
-    #categories = []; // Nouveau champ pour les catégories
+    #categories = [];
     #error = [];
+
+
     /**
      * @param {{ id?: number, title: string, authorId: number, publicationDate?: Date, description?: string, categoryIds?: number[] }} data
      */
     constructor(data) {
         this.#id = parseInt(data.id) || null;
         this.#title = data.title || null;
-        this.#author = parseInt(data.authorId) || null;
+        this.#authorId = parseInt(data.authorId) || null;
         this.#publicationDate = data.publicationDate ? new Date(data.publicationDate) : null;
         this.#description = data.description || '';
         this.#categories = Array.isArray(data.categoryIds) ? data.categoryIds.map(id => parseInt(id)) : [];
@@ -30,8 +32,8 @@ class Book {
         return this.#title;
     }
 
-    get author() {
-        return this.#author;
+    get authorId() {
+        return this.#authorId;
     }
 
     get publicationDate() {
@@ -45,13 +47,16 @@ class Book {
     get categories() {
         return this.#categories;
     }
+    get error() {
+        return this.#error;
+    }
 
     /**
      * @param {boolean} isUpdate - Indique si c'est une mise à jour
      * @returns {string[]} - Liste des erreurs
      */
     validate(isUpdate) {
-       this.#error = [];
+        this.#error = []; // Réinitialiser les erreurs avant la validation
 
         if (isUpdate && (this.#id === null || isNaN(this.#id))) {
             this.#error.push({ id: "L'ID du livre est invalide." });
@@ -60,7 +65,7 @@ class Book {
         if (!this.#title || this.#title.trim().length === 0) {
             this.#error.push({ title: "Le titre du livre est obligatoire." });
         }
-        if (!this.#author || isNaN(this.#author)) {
+        if (!this.#authorId || isNaN(this.#authorId)) {
             this.#error.push({ author: "L'auteur du livre est obligatoire et doit être un identifiant valide." });
         }
 
@@ -81,26 +86,4 @@ class Book {
         return this.#error;
     }
 
-    /**
-     * Convertit l'objet en JSON.
-     * @param {boolean} [includeId=true] - Inclure l'ID dans la sortie
-     * @returns {{title: null, authorId: null, publicationDate: null, description: null, categoryIds: number[]}}
-     */
-    toJson(includeId = true) {
-        const json = {
-            title: this.#title,
-            authorId: this.#author, // L'ID de l'auteur
-            publicationDate: this.#publicationDate,
-            description: this.#description,
-            categories: this.#categories, // Inclure les catégories
-        };
-
-        if (includeId) {
-            json.id = this.#id;
-        }
-
-        return json;
-    }
 }
-
-module.exports = Book;

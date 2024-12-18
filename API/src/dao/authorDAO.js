@@ -4,6 +4,10 @@ const AppError = require('../model/AppError'); // Assurez-vous que cette classe 
 const Author = require('../model/Author'); // Créez une classe modèle Author similaire à Book
 const BookDAO = require('../dao/bookDAO');
 
+function formatDate(date) {
+    return date ? new Date(date).toISOString().split('T')[0] : null;
+}
+
 class AuthorDAO {
     /**
      * Crée un nouvel auteur
@@ -34,12 +38,19 @@ class AuthorDAO {
      */
     async getAll() {
         try {
-            return await prisma.author.findMany();
+            const authors = await prisma.author.findMany();
+
+            // Formater les dates pour chaque auteur
+            return authors.map(author => ({
+                ...author,
+                birthDate: formatDate(author.birthDate),
+                deathDate: formatDate(author.deathDate),
+            }));
         } catch (error) {
             console.error(error);
             throw new AppError('Erreur lors de la récupération des auteurs.', 500);
         }
-    }
+    };
 
     /**
      * Récupère un auteur par ID
@@ -54,14 +65,23 @@ class AuthorDAO {
                 throw new AppError("ID d'auteur invalide.", 400);
             }
 
-            return await prisma.author.findUnique({
+            const author = await prisma.author.findUnique({
                 where: { id },
             });
+
+            if (author) {
+                // Formater les dates avant de retourner l'objet
+                author.birthDate = formatDate(author.birthDate);
+                author.deathDate = formatDate(author.deathDate);
+            }
+
+            return author;
         } catch (error) {
             console.error(error);
             throw new AppError('Erreur lors de la récupération de l\'auteur.', 500);
         }
-    }
+    };
+
 
     /**
      * Met à jour un auteur

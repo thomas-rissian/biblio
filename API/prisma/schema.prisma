@@ -26,8 +26,8 @@ model Category {
 model Book {
   id              Int            @id @default(autoincrement())
   title           String
-  description     String?
-  publicationDate DateTime?
+  description     String
+  publicationDate DateTime
   authorId        Int
   author          Author         @relation(fields: [authorId], references: [id], onDelete: Cascade)
   categories      Category[]     @relation("BookCategories") // Relation définie avec la table Category

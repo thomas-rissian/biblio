@@ -3,7 +3,12 @@ const prisma = new PrismaClient();
 const AppError = require('../model/AppError');
 const Book = require('../model/Book');
 
+function formatDate(date) {
+    return date ? new Date(date).toISOString().split('T')[0] : null;
+}
+
 class BookDAO {
+
 
     /**
      * Récupère un livre par ID
@@ -12,11 +17,45 @@ class BookDAO {
      */
     async getAll() {
         try {
-            return await prisma.book.findMany({
+            const books = await prisma.book.findMany({
+                include: {
+                    categories: true // Inclure les catégories dans la réponse
+                }
+            });
+
+            // Formater les dates pour chaque livre
+            return books.map(book => ({
+                ...book,
+                publicationDate: formatDate(book.publicationDate)
+            }));
+        } catch (error) {
+            throw new AppError('Erreur lors de la récupération du livre', 500);
+        }
+    }
+
+    /**
+     * Récupère un livre par ID
+     * @param {number} id
+     * @returns {Promise<Object|null>} Le livre trouvé ou null
+     * @throws {AppError} Si une erreur se produit lors de la récupération du livre
+     */
+    async getById(id) {
+        try {
+            id = parseInt(id);
+            const book = await prisma.book.findUnique({
+                where: {
+                    id: id
+                },
                 include: { // Inclure les catégories dans la réponse
                     categories: true
                 }
             });
+            if (book) {
+                // Formater les dates avant de retourner le résultat
+                book.publicationDate = formatDate(book.publicationDate);
+            }
+
+            return book;
         } catch (error) {
             throw new AppError('Erreur lors de la récupération du livre', 500);
         }
@@ -122,28 +161,6 @@ class BookDAO {
 
         } catch (error) {
             throw new Error('Erreur lors de la suppression du livre', error.message);
-        }
-    }
-
-    /**
-     * Récupère un livre par ID
-     * @param {number} id
-     * @returns {Promise<Object|null>} Le livre trouvé ou null
-     * @throws {AppError} Si une erreur se produit lors de la récupération du livre
-     */
-    async getById(id) {
-        try {
-            id = parseInt(id);
-            return await prisma.book.findUnique({
-                where: {
-                    id: id
-                },
-                include: { // Inclure les catégories dans la réponse
-                    categories: true
-                }
-            });
-        } catch (error) {
-            throw new AppError('Erreur lors de la récupération du livre', 500);
         }
     }
 

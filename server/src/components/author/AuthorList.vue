@@ -4,10 +4,13 @@
       <h1 class="form-title">Authors</h1>
       <button @click="createAuthor">Add New Author</button>
       <ul>
-        <li v-for="author in authors" :key="author.id">
-          <p>{{ author.name }}</p>
-          <button @click="editAuthor(author.id)">Edit</button>
-          <button @click="deleteAuthor(author.id)">Delete</button>
+        <li v-for="author in authors" :key="author.id" >
+          <p @click="detailAuthor(author.id)">{{ author.name }}</p>
+          <div class ="btnConfig">
+            <button @click="editAuthor(author.id)">Edit</button>
+            <button @click="deleteAuthor(author.id)">Delete</button>
+          </div>
+
         </li>
       </ul>
     </div>
@@ -30,6 +33,9 @@ export default {
     async deleteAuthor(id) {
       await deleteAuthor(id);
       this.authors = this.authors.filter((author) => author.id !== id);
+    },
+    detailAuthor(id){
+      this.$router.push(`/authors/${id}`);
     },
     editAuthor(id) {
       this.$router.push(`/authors/${id}/edit`);

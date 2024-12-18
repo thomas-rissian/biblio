@@ -1,15 +1,20 @@
-
-class Author {
+/**
+ * Représente un Auteur.
+ */
+export class Author {
     #id = null;
     #name = null;
     #birthDate = null;
     #deathDate = null;
     #biography = null;
-    #isUpdate = false;
 
-    constructor(data) {
-        this.#id = parseInt(data.id) || null; // L'ID est null pour la création
-        this.#name = data.name;
+    /**
+     * Constructeur de la classe Author.
+     * @param {{ id?: number, name: string, birthDate?: string, deathDate?: string, biography?: string }} data
+     */
+    constructor(data = {}) {
+        this.#id = parseInt(data.id) || null;
+        this.#name = data.name || '';
         this.#birthDate = data.birthDate ? new Date(data.birthDate) : null;
         this.#deathDate = data.deathDate ? new Date(data.deathDate) : null;
         this.#biography = data.biography || '';
@@ -36,9 +41,32 @@ class Author {
         return this.#biography;
     }
 
-    validate(isUpdate = true) {
+    // Setters (utilisés pour mettre à jour les champs)
+    set name(value) {
+        this.#name = value;
+    }
+
+    set birthDate(value) {
+        this.#birthDate = value ? new Date(value) : null;
+    }
+
+    set deathDate(value) {
+        this.#deathDate = value ? new Date(value) : null;
+    }
+
+    set biography(value) {
+        this.#biography = value;
+    }
+
+    /**
+     * Valide les données de l'auteur.
+     * @param {boolean} isUpdate - Indique s'il s'agit d'une mise à jour.
+     * @returns {Array.<{ [field: string]: string }>} Liste des erreurs par champ.
+     */
+    validate(isUpdate = false) {
         const errors = [];
 
+        // Si c'est une mise à jour, vérifier que l'ID est valide
         if (isUpdate && (this.#id === null || isNaN(this.#id))) {
             errors.push({ id: "L'ID de l'auteur est invalide." });
         }
@@ -56,27 +84,12 @@ class Author {
             errors.push({ birthDate: "La date de naissance est invalide." });
         }
 
+
         if (this.#birthDate && this.#deathDate && this.#deathDate < this.#birthDate) {
             errors.push({ deathDate: "La date de décès ne peut pas être antérieure à la date de naissance." });
         }
 
         return errors;
     }
-
-    toJson(includeId = true) {
-        const json = {
-            name: this.#name,
-            birthDate: this.#birthDate,
-            deathDate: this.#deathDate,
-            biography: this.#biography
-        };
-
-        if (includeId) {
-            json.id = this.#id;
-        }
-
-        return json;
-    }
 }
 
-module.exports = Author;

@@ -4,8 +4,13 @@
       <h1 class="form-title">Categories</h1>
       <button @click="createCategory">Add New Category</button>
       <ul>
-        <li v-for="category in categories" :key="category.id" @click="viewDetails(category.id)">
+        <li v-for="category in categories" :key="category.id">
           <p>{{ category.name }}</p>
+          <div class ="btnConfig">
+            <button @click="editCategory(category.id)">Edit</button>
+            <button @click="deleteCategory(category.id)">Delete</button>
+          </div>
+
         </li>
       </ul>
     </div>
@@ -25,8 +30,12 @@ export default {
     this.categories = await getCategories();
   },
   methods: {
-    viewDetails(id) {
-      this.$router.push(`/categories/${id}`);
+    async deleteCategory(id) {
+      await deleteCategory(id);
+      this.categories = this.categories.filter((categorie) => categorie.id !== id);
+    },
+    editCategory(id) {
+      this.$router.push(`/categories/${id}/edit`);
     },
     createCategory() {
       this.$router.push('/categories/create');

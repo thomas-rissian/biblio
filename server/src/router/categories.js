@@ -19,6 +19,12 @@ const categoryRoutes = [
         component: CategoryForm, // Vue pour modifier une catégorie
         props: true,
     },
+    {
+        path: '/categories/:id/delete',
+        name: 'edit-category',
+        component: CategoryForm,
+        props: true,
+    },
 ];
 
 export default categoryRoutes;

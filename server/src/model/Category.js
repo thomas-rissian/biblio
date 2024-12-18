@@ -1,12 +1,10 @@
-class Category {
+export class Category {
     #id = null;
     #name = null;
-    #isUpdate = false;
 
-    constructor(data, isUpdate = false) {
+    constructor(data) {
         this.#id = parseInt(data.id) || null;
-        this.#name = data.name;
-        this.#isUpdate = isUpdate;
+        this.#name = data.name?.trim() || null;
     }
 
     // Getters
@@ -18,9 +16,15 @@ class Category {
         return this.#name;
     }
 
+    /**
+     * Valide les données de la catégorie.
+     * @param {boolean} isUpdate - Indique si c'est une mise à jour.
+     * @returns {Object[]} - Liste des erreurs sous forme d'objets { champ: "message d'erreur" }.
+     */
     validate(isUpdate = true) {
         const errors = [];
 
+        // Validation de l'ID pour une mise à jour
         if (isUpdate && (this.#id === null || isNaN(this.#id))) {
             errors.push({ id: "L'ID de la catégorie est invalide." });
         }
@@ -33,17 +37,5 @@ class Category {
         return errors;
     }
 
-    toJson(includeId = true) {
-        const json = {
-            name: this.#name
-        };
-
-        if (includeId) {
-            json.id = this.#id;
-        }
-
-        return json;
-    }
 }
 
-module.exports = Category;
