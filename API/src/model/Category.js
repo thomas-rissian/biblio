@@ -1,12 +1,10 @@
 class Category {
     #id = null;
     #name = null;
-    #isUpdate = false;
 
-    constructor(data, isUpdate = false) {
+    constructor(data) {
         this.#id = parseInt(data.id) || null;
         this.#name = data.name;
-        this.#isUpdate = isUpdate;
     }
 
     // Getters
@@ -22,27 +20,15 @@ class Category {
         const errors = [];
 
         if (isUpdate && (this.#id === null || isNaN(this.#id))) {
-            errors.push({ id: "L'ID de la catégorie est invalide." });
+            errors.push("L'ID de la catégorie est invalide.");
         }
 
-        // Validation du champ "name"
-        if (!this.#name || this.#name.length === 0) {
-            errors.push({ name: "Le nom de la catégorie est obligatoire." });
+        // Vérification que le champ "name" est obligatoire et unique
+        if (!this.#name) {
+            errors.push("Le nom de la catégorie est obligatoire.");
         }
 
         return errors;
-    }
-
-    toJson(includeId = true) {
-        const json = {
-            name: this.#name
-        };
-
-        if (includeId) {
-            json.id = this.#id;
-        }
-
-        return json;
     }
 }
 

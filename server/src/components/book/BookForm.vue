@@ -118,7 +118,7 @@ export default {
   },
   computed: {
     isFormValid() {
-      return !Object.values(this.formErrors).some(error => error); // Si aucune erreur n'existe
+      return !Object.values(this.formErrors).some(error => error);
     },
   },
   methods: {
@@ -126,11 +126,9 @@ export default {
     validateField() {
       const bookModel = new Book(this.book);
       const errors = bookModel.validate(this.book.id !== undefined);
-    console.log(errors);
-      // Réinitialiser les erreurs
+
       this.formErrors = {};
 
-      // Remplir formErrors avec les erreurs de validation
       errors.forEach(error => {
         const [field, message] = Object.entries(error)[0];
         this.formErrors[field] = message;
@@ -138,7 +136,7 @@ export default {
     },
 
     async handleSubmit() {
-      // Valider tous les champs avant la soumission
+
       this.validateField();
 
       // Si des erreurs existent, ne pas envoyer le formulaire

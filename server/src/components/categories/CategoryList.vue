@@ -1,45 +1,17 @@
 <template>
-  <div class="container">
-    <div class="card">
-      <h1 class="form-title">Categories</h1>
-      <button @click="createCategory">Add New Category</button>
-      <ul>
-        <li v-for="category in categories" :key="category.id">
-          <p>{{ category.name }}</p>
-          <div class ="btnConfig">
-            <button @click="editCategory(category.id)">Edit</button>
-            <button @click="deleteCategory(category.id)">Delete</button>
-          </div>
-
-        </li>
-      </ul>
-    </div>
-  </div>
+  <List :deleteObject ="deleteCategory" :route ="'books'" :getItems = "getCategories" :title="'Catégories'"/>
 </template>
 
 <script>
-import { getCategories, deleteCategory } from '@/services/api/categorie.js';
+import {getCategories, deleteCategory, getCategoryById} from '@/services/api/categorie.js';
+import List from "@/components/modals/List.vue";
 
 export default {
-  data() {
-    return {
-      categories: [],
-    };
-  },
-  async created() {
-    this.categories = await getCategories();
-  },
+  components: {List},
   methods: {
-    async deleteCategory(id) {
-      await deleteCategory(id);
-      this.categories = this.categories.filter((categorie) => categorie.id !== id);
-    },
-    editCategory(id) {
-      this.$router.push(`/categories/${id}/edit`);
-    },
-    createCategory() {
-      this.$router.push('/categories/create');
-    },
+    getCategories,
+    deleteCategory,
+
   },
 };
 </script>

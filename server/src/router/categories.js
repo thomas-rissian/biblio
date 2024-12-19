@@ -21,7 +21,7 @@ const categoryRoutes = [
     },
     {
         path: '/categories/:id/delete',
-        name: 'edit-category',
+        name: 'delete-category',
         component: CategoryForm,
         props: true,
     },

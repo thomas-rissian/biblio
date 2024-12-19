@@ -1,5 +1,6 @@
 const categoryDAO = require('../dao/categoryDAO');
 const Category = require('../model/Category');
+const {Prisma} = require("@prisma/client");
 
 const handleRequest = async (req, res, callback) => {
     try {
@@ -45,11 +46,14 @@ const createCategory = async (req, res) =>
     handleRequest(req, res, async () => {
         const body = await readRequestBody(req);
         const data = JSON.parse(body);
+        const category = new Category(data);
+        if(category.validate(false  ).length===0){
+            const newCategory = await categoryDAO.create(data);
+            res.writeHead(201, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(newCategory));
+        }
 
-        const newCategory = await categoryDAO.create(new Category(data));
-        res.writeHead(201, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(newCategory));
-    });
+});
 
 const updateCategory = async (req, res) =>
     handleRequest(req, res, async () => {
@@ -61,7 +65,6 @@ const updateCategory = async (req, res) =>
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(updatedCategory));
     });
-
 const deleteCategory = async (req, res) =>
     handleRequest(req, res, async () => {
         const id = parseInt(req.url.split('/')[2]);

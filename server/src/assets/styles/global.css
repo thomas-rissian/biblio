@@ -75,7 +75,16 @@ select:focus {
     border-radius: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
-
+.card>div{
+    display: flex;
+    justify-content: right;
+    width: 100%;
+    margin-bottom: 30px;
+}
+.author-info, .book-info{
+    display: flex;
+    flex-direction: column;
+}
 ul {
     list-style-type: none;
 }
@@ -158,10 +167,5 @@ button:disabled {
 .detail-title {
     font-size: 24px;
     font-weight: bold;
-    margin-bottom: 20px;
-}
-
-.book-info {
-    font-size: 18px;
     margin-bottom: 20px;
 }

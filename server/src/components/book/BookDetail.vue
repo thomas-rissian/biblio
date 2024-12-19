@@ -4,7 +4,7 @@
     <div v-if="book" class="card detail-card">
       <h1 class="detail-title">{{ book.title }}</h1>
       <div class="book-info">
-        <p><strong>Auteur:</strong> {{ author.name }}</p>
+        <p><strong>Auteur:</strong @click="clickAuthor"> {{ author.name }}</p>
         <p><strong>Catégories:</strong>
           <span v-for="(category, index) in book.categories" :key="category.id">
             {{ category.name }}
@@ -121,6 +121,9 @@ export default {
     },
   },
   methods: {
+    clickAuthor(){
+      this.rout
+    },
     // Gérer la soumission du formulaire
     async handleSubmit() {
       if (this.book.id) {
@@ -130,7 +133,6 @@ export default {
       }
       this.$router.push('/books');
     },
-
     // Gérer la modification du livre
     editBook() {
       this.$router.push(`/books/${this.book.id}/edit`);

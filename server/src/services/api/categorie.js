@@ -17,7 +17,6 @@ export const createCategory = async (categoryData) => {
 export const updateCategory = async (id, categoryData) => {
     return (await axiosInstance.put(`/${API_URL}/${id}`, categoryData)).data;
 };
-
 export const deleteCategory = async (id) => {
     return (await axiosInstance.delete(`/${API_URL}/${id}`)).data;
 };

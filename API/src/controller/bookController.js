@@ -155,7 +155,13 @@ const getBooksByAuthor = async (req, res) => {
     res.writeHead(200, {'Content-Type': 'application/json'});
     res.end(JSON.stringify(books));
 };
+const getBooksByCategoryCount = async (req, res) => {
+    const urlParts = req.url.split('/');
+    const categoriesId = urlParts[3];
 
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    res.end(JSON.stringify(categoriesId));
+}
 const readRequestBody = (req) => new Promise((resolve, reject) => {
     let body = '';
     req.on('data', chunk => {
@@ -174,5 +180,6 @@ module.exports = {
     deleteBooksByCategory,
     deleteBooksByAuthor,
     getBooksByAuthor,
-    getBooksByCategory
+    getBooksByCategory,
+    getBooksByCategoryCount
 };
