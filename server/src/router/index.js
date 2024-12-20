@@ -9,9 +9,9 @@ import categoryRoutes from './categories.js';
 const router = createRouter({
     history: createWebHistory(),
     routes: [
-        ...bookRoutes, // Ajouter les routes des livres
-        ...authorRoutes, // Ajouter les routes des auteurs
-        ...categoryRoutes, // Ajouter les routes des catégories
+        ...bookRoutes,
+        ...authorRoutes,
+        ...categoryRoutes,
     ],
 });
 

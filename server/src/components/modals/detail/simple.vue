@@ -56,7 +56,9 @@ export default {
             <span v-if="index < text.length - 1">, </span>
           </span>
     <span v-else>{{ text }}</span>
+
     <ul v-if ="items !== null && type==='list'">
+
       <li v-for="item in items" :key="item.id" @click="click(this.url.replace('replace', item.id))">
         {{item.title || item.name}}
       </li>

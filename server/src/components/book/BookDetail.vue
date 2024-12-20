@@ -10,7 +10,7 @@
 <script>
 import { getBookById } from '@/services/api/book';
 import Simple from "@/components/modals/detail/simple.vue";
-import Background from "@/components/modals/background.vue";
+import Background from "@/components/modals/detail/backgroundInfo.vue";
 
 export default {
   components: {Background, Simple},
@@ -36,7 +36,5 @@ export default {
 
 <style scoped>
 @import '@/assets/styles/global.css';
-
-
 
 </style>

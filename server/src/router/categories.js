@@ -1,22 +1,27 @@
-import { createRouter, createWebHistory } from 'vue-router';
 import CategoryList from '@/components/categories/CategoryList.vue';
 import CategoryForm from '@/components/categories/CategoryForm.vue';
+import CategoryDetail from "@/components/categories/CategoryDetail.vue";
 
 const categoryRoutes = [
     {
         path: '/categories',
         name: 'category-list',
-        component: CategoryList, // Vue pour afficher la liste des catégories
+        component: CategoryList,
+    },
+    {
+        path: '/categories/:id',
+        name: 'category-detail',
+        component: CategoryDetail,
     },
     {
         path: '/categories/create',
         name: 'create-category',
-        component: CategoryForm, // Vue pour créer une catégorie
+        component: CategoryForm,
     },
     {
         path: '/categories/:id/edit',
         name: 'edit-category',
-        component: CategoryForm, // Vue pour modifier une catégorie
+        component: CategoryForm,
         props: true,
     },
     {

@@ -8,15 +8,6 @@ export default {
     title: {
       type: String,
       required: true,
-    },
-    url:{
-      type: String,
-      required: true,
-    }
-  },
-  methods: {
-    edit(){
-      this.$router.push(this.url);
     }
   }
 }
@@ -25,12 +16,11 @@ export default {
 <template>
   <div class="container">
     <!-- Détail du livre -->
-    <div v-if="item" class="card detail-card">
+    <div v-if="item" class="card ">
       <h1 class="detail-title">{{ title }}</h1>
       <div class="book-info">
-      <slot></slot>
+        <slot></slot>
       </div>
-      <button @click="edit" class="edit-button">Modifier</button>
     </div>
 
   </div>

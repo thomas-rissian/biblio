@@ -11,7 +11,7 @@
 import { getAuthorById } from '@/services/api/author';
 import {  getBooksByAuthor} from '@/services/api/book';
 import Simple from "@/components/modals/detail/simple.vue";
-import Background from "@/components/modals/background.vue";
+import Background from "@/components/modals/detail/backgroundInfo.vue";
 export default {
   components: {Background, Simple},
   data() {

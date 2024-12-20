@@ -1,9 +1,9 @@
 <template>
-  <List :deleteObject ="deleteCategory" :route ="'categories'" :getItems = "getCategories" :title="'Catégories'" :detail="false"/>
+  <List :deleteObject ="deleteCategory" :route ="'categories'" :getItems = "getCategories" :title="'Catégories'" />
 </template>
 
 <script>
-import {getCategories, deleteCategory, getCategoryById} from '@/services/api/categorie.js';
+import {getCategories, deleteCategory} from '@/services/api/categorie.js';
 import List from "@/components/modals/List.vue";
 
 export default {
