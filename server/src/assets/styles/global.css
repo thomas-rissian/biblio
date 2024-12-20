@@ -173,6 +173,10 @@ button:disabled {
     cursor: pointer;
     text-decoration: underline;
 }
+.clickMe{
+    text-decoration: none;
+    color: black;
+}
 .search-bar {
     display: flex;
     flex-direction: row;

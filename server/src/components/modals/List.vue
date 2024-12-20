@@ -25,8 +25,11 @@ export default {
       required: true
     },
     title:{
-        required: true,
+      required: true,
       default:""
+    },
+    detail:{
+      default:true,
     }
   },
   async created() {
@@ -37,7 +40,10 @@ export default {
   },
   methods: {
     detailItem(id) {
-      this.$router.push(`/${this.route}/${id}`);
+      if(this.detail){
+        this.$router.push(`/${this.route}/${id}`);
+      }
+
     },
     async deleteItem(id) {
       await this.deleteObject(id);

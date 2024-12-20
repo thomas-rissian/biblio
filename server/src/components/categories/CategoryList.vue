@@ -1,5 +1,5 @@
 <template>
-  <List :deleteObject ="deleteCategory" :route ="'books'" :getItems = "getCategories" :title="'Catégories'"/>
+  <List :deleteObject ="deleteCategory" :route ="'categories'" :getItems = "getCategories" :title="'Catégories'" :detail="false"/>
 </template>
 
 <script>
