@@ -19,16 +19,23 @@ class BookDAO {
         try {
             const books = await prisma.book.findMany({
                 include: {
-                    categories: true // Inclure les catégories dans la réponse
+                    author: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
+                    categories: true
                 }
             });
-
+            console.log(books);
             // Formater les dates pour chaque livre
             return books.map(book => ({
                 ...book,
                 publicationDate: formatDate(book.publicationDate)
             }));
         } catch (error) {
+            console.error(error);
             throw new AppError('Erreur lors de la récupération du livre', 500);
         }
     }
@@ -46,17 +53,24 @@ class BookDAO {
                 where: {
                     id: id
                 },
-                include: { // Inclure les catégories dans la réponse
+                include: {
+                    author: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
                     categories: true
                 }
+
             });
             if (book) {
-                // Formater les dates avant de retourner le résultat
                 book.publicationDate = formatDate(book.publicationDate);
             }
 
             return book;
         } catch (error) {
+            console.error(error);
             throw new AppError('Erreur lors de la récupération du livre', 500);
         }
     }
@@ -217,6 +231,15 @@ class BookDAO {
         try {
             authorId = parseInt(authorId);
             return await prisma.book.findMany({
+                include: {
+                    author: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
+                    categories: true
+                },
                 where: {
                     authorId: authorId,
                 },
@@ -235,7 +258,16 @@ class BookDAO {
     async getBooksByCategory(categoryId) {
         try {
             categoryId = parseInt(categoryId);
-            return await prisma.book.findMany({
+            return await prisma.book.findMany({include: {
+                    author: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
+                    categories: true
+                },
+
                 where: {
                     categories: {
                         some: {

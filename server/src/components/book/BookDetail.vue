@@ -4,10 +4,10 @@
     <div v-if="book" class="card detail-card">
       <h1 class="detail-title">{{ book.title }}</h1>
       <div class="book-info">
-        <p><strong>Auteur:</strong @click="clickAuthor"> {{ author.name }}</p>
+        <p><strong>Auteur:</strong > <a class="clickMe" @click="click('/books/authors/'+author.id)">{{ author.name }}</a></p>
         <p><strong>Catégories:</strong>
           <span v-for="(category, index) in book.categories" :key="category.id">
-            {{ category.name }}
+            <a class="clickMe" @click="click('/books/categories/'+category.id)">{{ category.name }}</a>
             <span v-if="index < book.categories.length - 1">, </span>
           </span>
         </p>
@@ -121,8 +121,8 @@ export default {
     },
   },
   methods: {
-    clickAuthor(){
-      this.rout
+    click(route){
+      this.$router.push(route);
     },
     // Gérer la soumission du formulaire
     async handleSubmit() {

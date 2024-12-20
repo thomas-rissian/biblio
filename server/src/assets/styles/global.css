@@ -75,10 +75,10 @@ select:focus {
     border-radius: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
-.card>div{
+.card .addButton{
     display: flex;
-    justify-content: right;
     width: 100%;
+    justify-content: right;
     margin-bottom: 30px;
 }
 .author-info, .book-info{
@@ -168,4 +168,34 @@ button:disabled {
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 20px;
+}
+.clickMe:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+.search-bar {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 2%;
+}
+.search {
+    display: flex; /* Aligne le label et l'input sur la même ligne */
+    flex-direction: column;
+    margin: 0 1%;
+}
+
+.search label {
+    margin-right: 10px; /* Ajoute un espacement après le label */
+}
+
+.search input {
+    padding: 5px; /* Ajoute de l'espace intérieur */
+    border: 1px solid #ccc; /* Bordure légère */
+    border-radius: 5px; /* Coins arrondis */
+    max-width: 100%;
+}
+.search:nth-child(1) {
+    display: none;
 }

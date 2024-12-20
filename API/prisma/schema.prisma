@@ -9,11 +9,11 @@ datasource db {
 
 model Author {
   id        Int       @id @default(autoincrement())
-  name      String // Le nom devient obligatoire
-  birthDate DateTime? // Date de naissance, optionnelle
-  deathDate DateTime? // Date de décès, optionnelle
-  biography String? // Biographie, optionnelle
-  books     Book[] // Relation avec les livres
+  name      String
+  birthDate DateTime?
+  deathDate DateTime?
+  biography String?
+  books     Book[]
 }
 
 model Category {
@@ -30,7 +30,7 @@ model Book {
   publicationDate DateTime
   authorId        Int
   author          Author         @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  categories      Category[]     @relation("BookCategories") // Relation définie avec la table Category
+  categories      Category[]     @relation("BookCategories")
   BookCategory    BookCategory[]
 }
 
