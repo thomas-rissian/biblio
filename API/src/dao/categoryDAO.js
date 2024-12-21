@@ -133,6 +133,30 @@ class CategoryDAO {
             where: { id },
         });
     }
+
+    async getCategoriesBookCount() {
+        try {
+            const categoriesWithBookCount = await prisma.category.findMany({
+                select: {
+                    id: true,
+                    name: true,
+                    _count: {
+                        select: { books: true },
+                    },
+                },
+            });
+
+            const result = categoriesWithBookCount.map(category => ({
+                id: category.id,
+                name: category.name,
+                count: category._count.books,
+            }));
+
+            return result;
+        }catch (error) {
+            throw new AppError('Erreur lors de la récupération du nombre de livre par catégories', 500);
+        }
+    }
 }
 
 module.exports = new CategoryDAO();

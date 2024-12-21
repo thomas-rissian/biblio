@@ -20,3 +20,6 @@ export const updateCategory = async (id, categoryData) => {
 export const deleteCategory = async (id) => {
     return (await axiosInstance.delete(`/${API_URL}/${id}`)).data;
 };
+export const countBookCategories = async () => {
+    return (await axiosInstance.get(`/${API_URL}/books/count`)).data;
+};

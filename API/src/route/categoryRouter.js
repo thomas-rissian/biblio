@@ -41,6 +41,14 @@ const routes = [
             categoryController.deleteCategoryAndManageBooks(req, res);
         }
     },
+    {
+        // Récupère le nombre de livre par catégories
+        pattern: /^\/categories\/books\/count$/,
+        method: 'GET',
+        handler: (req, res) => {
+            categoryController.countBooksCategories(req, res);
+        }
+    },
 ];
 
 module.exports = routes;

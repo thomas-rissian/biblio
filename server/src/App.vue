@@ -5,6 +5,7 @@
       <router-link to="/books">Livres</router-link>
       <router-link to="/authors">Auteurs</router-link>
       <router-link to="/categories">Catégories</router-link>
+      <router-link to="/statistique">Statistique</router-link>
     </nav>
     <router-view />
   </div>

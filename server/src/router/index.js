@@ -3,7 +3,9 @@ import { createRouter, createWebHistory } from 'vue-router';
 // Importer les routes spécifiques des livres, auteurs et catégories
 import bookRoutes from './book.js';
 import authorRoutes from './author.js';
+import statistiqueRoutes from './statistique.js';
 import categoryRoutes from './categories.js';
+
 
 // Créer une instance du routeur
 const router = createRouter({
@@ -12,6 +14,7 @@ const router = createRouter({
         ...bookRoutes,
         ...authorRoutes,
         ...categoryRoutes,
+        ...statistiqueRoutes,
     ],
 });
 

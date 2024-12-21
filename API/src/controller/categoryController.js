@@ -80,12 +80,18 @@ const deleteCategoryAndManageBooks = async (req, res) =>
         res.writeHead(200);
         res.end();
     });
-
+const countBooksCategories = async (req, res) =>
+    handleRequest(req, res, async () => {
+       const categories = await categoryDAO.getCategoriesBookCount();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(categories));
+    });
 module.exports = {
     getAllCategories,
     getOneCategory,
     createCategory,
     updateCategory,
     deleteCategory,
-    deleteCategoryAndManageBooks
+    deleteCategoryAndManageBooks,
+    countBooksCategories
 };
