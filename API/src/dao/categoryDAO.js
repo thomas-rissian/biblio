@@ -12,7 +12,7 @@ class CategoryDAO {
     }
 
     /**
-     * Récupère une catégorie par son ID
+     * Récupère une catégori²e par son ID
      * @param {number} id
      * @returns {Promise<Object|null>}
      */
@@ -42,13 +42,11 @@ class CategoryDAO {
 
     /**
      * Met à jour une catégorie par son ID
-     * @param {number} id
-     * @param {Object} data
      * @returns {Promise<Object>}
      */
-    async update(id, data) {
-        id = parseInt(id);
-        if (isNaN(id) || !data || !data.name) {
+    async update(data) {
+        const id = parseInt(data.id);
+        if (isNaN(data.id) || !data || !data.name) {
             throw new AppError("Données ou ID de catégorie invalides.", 400);
         }
         return prisma.category.update({
@@ -84,9 +82,13 @@ class CategoryDAO {
 
             // Traiter chaque livre
             for (const book of booksWithCategory) {
+                // Si le livre n'a plus aucune autre catégorie, on le supprime
                 if (book.categories.length === 1 && book.categories[0].id === categoryId) {
-                    await BookDAO.delete(book.id);
+                    await prisma.book.delete({
+                        where: { id: book.id },
+                    });
                 } else {
+                    // Sinon, on dissocie la catégorie du livre
                     await prisma.book.update({
                         where: { id: book.id },
                         data: {
@@ -98,7 +100,11 @@ class CategoryDAO {
                 }
             }
 
-            await this.delete(categoryId);
+            // Supprimer la catégorie
+            await prisma.category.delete({
+                where: { id: categoryId },
+            });
+
         } catch (error) {
             console.error(error);
             if (error.code === 'P2003') {
@@ -110,6 +116,7 @@ class CategoryDAO {
             throw new AppError('Erreur lors de la suppression de la catégorie.', 500);
         }
     }
+
 
 
     /**

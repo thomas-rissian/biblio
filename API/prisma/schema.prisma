@@ -17,29 +17,17 @@ model Author {
 }
 
 model Category {
-  id           Int            @id @default(autoincrement())
-  name         String         @unique
-  books        Book[]         @relation("BookCategories")
-  BookCategory BookCategory[]
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  books Book[] @relation("BookCategories")
 }
 
 model Book {
-  id              Int            @id @default(autoincrement())
+  id              Int        @id @default(autoincrement())
   title           String
   description     String
   publicationDate DateTime
   authorId        Int
-  author          Author         @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  categories      Category[]     @relation("BookCategories")
-  BookCategory    BookCategory[]
-}
-
-/// Table pivot pour la relation plusieurs-à-plusieurs entre livres et catégories
-model BookCategory {
-  bookId     Int
-  categoryId Int
-  book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  @@id([bookId, categoryId]) // Clé primaire composite
+  author          Author     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  categories      Category[] @relation("BookCategories")
 }

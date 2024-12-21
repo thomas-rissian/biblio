@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     edit(){
-      this.$router.push(this.url);
+      this.$router.push(this.url+'/edit');
     }
   }
 }

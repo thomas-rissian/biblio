@@ -1,5 +1,5 @@
 <template>
-  <background :title="author.name" :url="'/authors/'+this.author.id+'/edit'" :item="author">
+  <background :title="author.name" :url="'/authors/'+this.author.id" :item="author">
     <Simple :text='author.biography' field="Biographie"></Simple>
     <Simple :text='author.birthDate' field="Date de Naissance" type="date"></Simple>
     <Simple :text='author.deathDate' field="Date de décès" type="date"></Simple>

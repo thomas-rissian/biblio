@@ -1,4 +1,3 @@
-
 <script>
 import * as sea from "node:sea";
 import Background from "@/components/modals/background.vue";
@@ -6,7 +5,7 @@ import ListItem from "@/components/modals/listItem.vue";
 import SearchBar from "@/components/modals/search.vue";
 
 export default {
-  components: {ListItem, Background,SearchBar},
+  components: { ListItem, Background, SearchBar },
   data() {
     return {
       items: [],
@@ -15,26 +14,26 @@ export default {
     };
   },
   props: {
-    deleteObject:{
+    deleteObject: {
       type: Function,
-      required: true
+      required: true,
     },
-    route:{
+    route: {
       type: String,
       required: true,
-      default:""
+      default: "",
     },
-    getItems:{
+    getItems: {
       type: Function,
-      required: true
-    },
-    title:{
       required: true,
-      default:""
     },
-    detail:{
-      default:true,
-    }
+    title: {
+      required: true,
+      default: "",
+    },
+    detail: {
+      default: true,
+    },
   },
   async created() {
     this.items = await this.getItems();
@@ -55,13 +54,18 @@ export default {
 
 <template>
   <Background :item="this.items" :title="title">
-      <p>Nombre : {{count}}</p>
-      <div class="addButton">
-        <button @click="createItem">Ajouter</button>
-      </div>
+    <p>Nombre : {{ count }}</p>
+    <div class="addButton">
+      <button @click="createItem">Ajouter</button>
+    </div>
     <SearchBar :items-backup="this.itemsBackup" @filtered-items="updateFilteredItems"></SearchBar>
-    <listItem :items="this.items" :url="this.route" :detail = "this.detail"></listItem>
-
+    <listItem
+        :items="this.items"
+        :url="this.route"
+        :detail="this.detail"
+        :deleteObject="deleteObject"
+        @newItems="updateFilteredItems"
+    ></listItem>
   </Background>
 </template>
 

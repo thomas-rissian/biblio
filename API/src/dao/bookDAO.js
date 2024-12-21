@@ -162,6 +162,7 @@ class BookDAO {
     async delete(id) {
         try {
             id = parseInt(id);
+            console.log(id);
             if (isNaN(id)) {
                 throw new Error('ID du livre invalide');
             }
@@ -169,11 +170,13 @@ class BookDAO {
             if (!book) {
                 throw new AppError("Livre non trouvé", 400);
             }
+
             return await prisma.book.deleteMany({
                 where: { id: id },
             });
 
         } catch (error) {
+            console.log(error);
             throw new Error('Erreur lors de la suppression du livre', error.message);
         }
     }

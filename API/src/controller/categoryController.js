@@ -61,7 +61,7 @@ const updateCategory = async (req, res) =>
         const body = await readRequestBody(req);
         const data = JSON.parse(body);
         data.id = id;
-        const updatedCategory = await categoryDAO.update(new Category(data));
+        const updatedCategory = await categoryDAO.update(data);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(updatedCategory));
     });

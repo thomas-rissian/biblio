@@ -1,5 +1,5 @@
 <template>
-  <background :title="this.categories.name" :url="'/books/category/'+this.categories.id" :item="this.categories">
+  <background :title="this.categories.name" :url="'/categories/'+this.categories.id" :item="this.categories">
     <Simple :text='this.bookCategories.length' :field="'Livres '" type="list" :items = "this.bookCategories" url="/books/replace"></Simple>
   </background>
 </template>

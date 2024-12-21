@@ -1,5 +1,5 @@
 <template>
-  <background :title="book.title" :url="'/books/'+this.book.id+'/edit'" :item="book"type="base">
+  <background :title="book.title" :url="'/books/'+this.book.id" :item="book"type="base">
     <Simple :url="'/authors/'+this.author.id" :text='author.name' field="Auteur"type="base"></Simple>
     <Simple :text='book.categories' url="/books/categories/" field="Catégories" type="listInline"></Simple>
     <Simple :text='book.description' field="Description" type="base"></Simple>

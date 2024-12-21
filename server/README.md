@@ -26,7 +26,7 @@ npm start
 Cela lancera le serveur de développement et vous permettra d’accéder à l'application via votre navigateur.
 
 Le site web est disponile à l'adresse suivante :  
-   [http://localhost:40080](http://localhost:40080)
+   [http://localhost:5173](http://localhost:5173)
 
 ---
 

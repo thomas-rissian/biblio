@@ -131,6 +131,7 @@ class AuthorDAO {
                     400
                 );
             }
+            console.log(error)
             throw new AppError('Erreur lors de la suppression de l\'auteur.', 500);
         }
     }
