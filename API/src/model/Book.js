@@ -50,7 +50,7 @@ class Book {
      * @param {boolean} isUpdate - Indique si c'est une mise à jour
      * @returns {string[]} - Liste des erreurs
      */
-    validate(isUpdate) {
+    validate(isUpdate = true) {
        this.#error = [];
 
         if (isUpdate && (this.#id === null || isNaN(this.#id))) {

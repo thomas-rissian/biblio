@@ -91,9 +91,12 @@ class AuthorDAO {
      */
     async update(author) {
         try {
+            if (!(author instanceof Author) || author.validate(false).length >0) {
+                throw new AppError("Données d'auteur invalides.", 400);
+            }
             const id = parseInt(author.id);
 
-            if (isNaN(id) && author.validate().length >0) {
+            if (isNaN(id)) {
                 throw new AppError("ID d'auteur invalide.", 400);
             }
             const data = author.toJson();

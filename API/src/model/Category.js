@@ -30,6 +30,17 @@ class Category {
 
         return errors;
     }
+    toJson(includeId = true) {
+        const json = {
+            name: this.#name,
+        };
+
+        if (includeId) {
+            json.id = this.#id;
+        }
+
+        return json;
+    }
 }
 
 module.exports = Category;

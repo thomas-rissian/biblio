@@ -66,13 +66,6 @@ const bookRoutes = [
             bookController.getBooksByCategory(req, res);
         },
     },
-    {
-        pattern: /^\/books\/categories\/(\d+)\/count$/, // Gère '/books/category/:categoryId/count' en GET pour lister les livres d'une catégorie
-        method: 'GET',
-        handler: (req, res, match) => {
-            bookController.getBooksByCategoryCount(req, res);
-        },
-    },
 
 
 ];

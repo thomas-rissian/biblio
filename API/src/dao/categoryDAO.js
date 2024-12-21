@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const AppError = require('../model/AppError');
-const BookDAO = require('./BookDAO');
+const Categories = require("../model/Category");
 class CategoryDAO {
     /**
      * Récupère toutes les catégories
@@ -28,13 +28,14 @@ class CategoryDAO {
 
     /**
      * Crée une nouvelle catégorie
-     * @param {Object} data
+     * @param {Categories} categories
      * @returns {Promise<Object>}
      */
-    async create(data) {
-        if (!data || !data.name) {
-            throw new Error("Données de catégorie invalides.");
+    async create(categories) {
+        if (!(categories instanceof Categories) || categories.validate(false).length >0) {
+            throw new AppError("Données de catégories invalides.", 400);
         }
+        const data = categories.toJson();
         return prisma.category.create({
             data,
         });
@@ -42,13 +43,18 @@ class CategoryDAO {
 
     /**
      * Met à jour une catégorie par son ID
+     * @param  {Categories} categories
      * @returns {Promise<Object>}
      */
-    async update(data) {
-        const id = parseInt(data.id);
-        if (isNaN(data.id) || !data || !data.name) {
+    async update(categories) {
+        if (!(categories instanceof Categories) || categories.validate(false).length >0) {
+            throw new AppError("Données de catégories invalides.", 400);
+        }
+        const id = parseInt(categories.id);
+        if (isNaN(id)) {
             throw new AppError("Données ou ID de catégorie invalides.", 400);
         }
+        const data = categories.toJson();
         return prisma.category.update({
             where: { id },
             data,
@@ -66,7 +72,6 @@ class CategoryDAO {
                 throw new AppError("ID de catégorie invalide.", 400);
             }
 
-            // Récupérer tous les livres liés à la catégorie
             const booksWithCategory = await prisma.book.findMany({
                 where: {
                     categories: {
@@ -100,7 +105,6 @@ class CategoryDAO {
                 }
             }
 
-            // Supprimer la catégorie
             await prisma.category.delete({
                 where: { id: categoryId },
             });
@@ -146,13 +150,12 @@ class CategoryDAO {
                 },
             });
 
-            const result = categoriesWithBookCount.map(category => ({
+            return categoriesWithBookCount.map(category => ({
                 id: category.id,
                 name: category.name,
                 count: category._count.books,
             }));
 
-            return result;
         }catch (error) {
             throw new AppError('Erreur lors de la récupération du nombre de livre par catégories', 500);
         }

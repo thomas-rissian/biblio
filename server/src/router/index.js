@@ -22,6 +22,10 @@ const router = createRouter({
         ...authorRoutes,
         ...categoryRoutes,
         ...statistiqueRoutes,
+        {
+            path: '/:pathMatch(.*)*',
+            redirect: '/'
+        }
 
     ],
 });

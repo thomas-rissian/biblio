@@ -9,7 +9,6 @@ function formatDate(date) {
 
 class BookDAO {
 
-
     /**
      * Récupère un livre par ID
      * @returns {Promise<Object|null>} Liste de livre
@@ -28,14 +27,11 @@ class BookDAO {
                     categories: true
                 }
             });
-            console.log(books);
-            // Formater les dates pour chaque livre
             return books.map(book => ({
                 ...book,
                 publicationDate: formatDate(book.publicationDate)
             }));
         } catch (error) {
-            console.error(error);
             throw new AppError('Erreur lors de la récupération du livre', 500);
         }
     }
@@ -49,6 +45,9 @@ class BookDAO {
     async getById(id) {
         try {
             id = parseInt(id);
+            if (isNaN(id)) {
+                throw new Error('ID du livre invalide');
+            }
             const book = await prisma.book.findUnique({
                 where: {
                     id: id
@@ -82,16 +81,13 @@ class BookDAO {
      */
     async create(book) {
         try {
-            // Assurez-vous que bookData est une instance de Book
-            if (!(book instanceof Book)) {
+            if (!(book instanceof Book) || book.validate(false).length >0) {
                 throw new AppError("Données de livre invalides.", 400);
             }
-
-            const categoryIds = book.categories; // Utiliser le getter "categories"
+            const categoryIds = book.categories;
 
             const bookJson = book.toJson(false);
 
-            // Vérifie si categoryIds est défini et s'il contient des éléments
             const categoriesConnect = categoryIds && Array.isArray(categoryIds) && categoryIds.length > 0
                 ? {
                     categories: {
@@ -100,11 +96,10 @@ class BookDAO {
                 }
                 : {};
 
-            // Création du livre dans la base de données avec Prisma
             return await prisma.book.create({
                 data: {
-                    ...bookJson, // Les autres données du livre
-                    ...categoriesConnect // Ajouter les catégories connectées si elles existent
+                    ...bookJson,
+                    ...categoriesConnect
                 }
             });
 
@@ -121,7 +116,9 @@ class BookDAO {
      */
     async update(book) {
         try {
-            // Vérifiez les catégories spécifiées
+            if (!(book instanceof Book) || book.validate(false).length >0) {
+                throw new AppError("Données de livre invalides.", 400);
+            }
             const validCategories = await prisma.category.findMany({
                 where: { id: { in: book.categories } },
             });
@@ -133,8 +130,7 @@ class BookDAO {
                 );
             }
 
-            // Réattribuez les catégories et mettez à jour les autres champs
-            const updatedBook = await prisma.book.update({
+            return await prisma.book.update({
                 where: { id: book.id },
                 data: {
                     ...book.toJson(false),
@@ -144,7 +140,6 @@ class BookDAO {
                 },
             });
 
-            return updatedBook;
         } catch (error) {
             throw new AppError(
                 "Erreur lors de la mise à jour du livre",
@@ -162,7 +157,6 @@ class BookDAO {
     async delete(id) {
         try {
             id = parseInt(id);
-            console.log(id);
             if (isNaN(id)) {
                 throw new Error('ID du livre invalide');
             }
@@ -176,8 +170,10 @@ class BookDAO {
             });
 
         } catch (error) {
-            console.log(error);
-            throw new Error('Erreur lors de la suppression du livre', error.message);
+            throw new AppError(
+                "Erreur lors de la mise à jour du livre" + error.message,
+                 500
+            );
         }
     }
 
@@ -190,6 +186,9 @@ class BookDAO {
     async deleteByAuthor(id) {
         try {
             id = parseInt(id);
+            if (isNaN(id)) {
+                throw new Error('ID du livre invalide');
+            }
             const result = await prisma.book.deleteMany({
                 where: { authorId: id },
             });
@@ -208,14 +207,15 @@ class BookDAO {
     async deleteByCategory(id) {
         try {
             id = parseInt(id);
-            // Dissocier les livres de la catégorie
+            if (isNaN(id)) {
+                throw new Error('ID du livre invalide');
+            }
             await prisma.bookCategory.deleteMany({
                 where: {
                     categoryId: id,
                 },
             });
 
-            // Supprimer les livres associés à la catégorie
             await prisma.book.deleteMany({
                 where: {
                     categories: {
@@ -233,6 +233,9 @@ class BookDAO {
     async getBooksByAuthor(authorId) {
         try {
             authorId = parseInt(authorId);
+            if (isNaN(authorId)) {
+                throw new Error('ID du livre invalide');
+            }
             return await prisma.book.findMany({
                 include: {
                     author: {
@@ -261,6 +264,9 @@ class BookDAO {
     async getBooksByCategory(categoryId) {
         try {
             categoryId = parseInt(categoryId);
+            if (isNaN(categoryId)) {
+                throw new Error('ID du livre invalide');
+            }
             return await prisma.book.findMany({include: {
                     author: {
                         select: {
