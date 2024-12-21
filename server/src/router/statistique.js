@@ -3,7 +3,7 @@ import Statistique from "@/components/statistique/Statistique.vue";
 const statistiqueRoutes = [
     {
         path: '/statistique',
-        name: 'category-list',
+        name: 'statistique-categories-book',
         component: Statistique,
     },
 ];
