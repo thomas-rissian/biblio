@@ -15,15 +15,6 @@ L'API est hébergée sur un serveur distinct pour garantir une indépendance com
    npm install
    ```
 
-2. Démarrage du serveur :
-   ```sh
-   npm start
-   ```
-
-   L'API sera accessible par défaut à l'adresse suivante :  
-   [http://localhost:40000](http://localhost:40000)
-
----
 
 ## Base de données
 
@@ -53,6 +44,14 @@ L'API est hébergée sur un serveur distinct pour garantir une indépendance com
    ```
 
 ---
+
+Démarrage du serveur :
+   ```sh
+   npm start
+   ```
+
+   L'API sera accessible par défaut à l'adresse suivante :  
+   [http://localhost:40000](http://localhost:40000)
 
 ## Routes disponibles
 

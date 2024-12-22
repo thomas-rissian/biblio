@@ -10,17 +10,19 @@
 Pour installer les dépendances nécessaires, exécutez la commande suivante :
 
 ```bash
-npm install -dev
+npm install
 ```
 
 ---
+
+Allez dans `/src/config/config.js` pour modifier l'accès à l'API.
 
 ## Lancement de l'application
 
 Une fois l'installation terminée, vous pouvez démarrer le projet en utilisant la commande suivante :
 
 ```bash
-npm run run preview
+npm run dev
 ```
 
 Cela lancera le serveur de développement et vous permettra d’accéder à l'application via votre navigateur.
