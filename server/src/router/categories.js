@@ -9,14 +9,14 @@ const categoryRoutes = [
         component: CategoryList,
     },
     {
-        path: '/categories/:id',
-        name: 'category-detail',
-        component: CategoryDetail,
-    },
-    {
         path: '/categories/create',
         name: 'create-category',
         component: CategoryForm,
+    },
+    {
+        path: '/categories/:id',
+        name: 'category-detail',
+        component: CategoryDetail,
     },
     {
         path: '/categories/:id/edit',

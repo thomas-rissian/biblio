@@ -24,12 +24,10 @@ export class Category {
     validate(isUpdate = true) {
         const errors = [];
 
-        // Validation de l'ID pour une mise à jour
         if (isUpdate && (this.#id === null || isNaN(this.#id))) {
             errors.push({ id: "L'ID de la catégorie est invalide." });
         }
 
-        // Validation du champ "name"
         if (!this.#name || this.#name.length === 0) {
             errors.push({ name: "Le nom de la catégorie est obligatoire." });
         }

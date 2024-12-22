@@ -66,20 +66,16 @@ export class Author {
     validate(isUpdate = false) {
         const errors = [];
 
-        // Si c'est une mise à jour, vérifier que l'ID est valide
         if (isUpdate && (this.#id === null || isNaN(this.#id))) {
             errors.push({ id: "L'ID de l'auteur est invalide." });
         }
 
-        // Vérification du champ "name"
         if (!this.#name || this.#name.trim().length === 0) {
             errors.push({ name: "Le nom de l'auteur est obligatoire." });
         }
-        // Vérification du champ "name"
         if (!this.#biography || this.#biography.trim().length === 0) {
-            errors.push({ biography: "Le nom de l'auteur est obligatoire." });
+            errors.push({ biography: "La biographie de l'auteur est obligatoire." });
         }
-        // Vérification de la cohérence des dates
         if (this.#birthDate && isNaN(this.#birthDate.getTime()) || !this.#birthDate) {
             errors.push({ birthDate: "La date de naissance est invalide." });
         }

@@ -219,6 +219,7 @@ button:disabled {
 .chart-container {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
     align-items: flex-end;
     height: 80vh;
     padding-top: 20px;
@@ -229,7 +230,7 @@ button:disabled {
     flex-direction: column;
     align-items: center;
     cursor: pointer;
-    width: 60px; /* Fixe une largeur pour chaque catégorie */
+    padding: 10px;
     text-align: center;
 }
 

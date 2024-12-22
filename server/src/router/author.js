@@ -10,14 +10,14 @@ const authorRoutes = [
         component: AuthorList, // Vue pour afficher la liste des auteurs
     },
     {
-        path: '/authors/:id',
-        name: 'author-detail',
-        component: AuthorDetail, // Vue pour afficher la liste des auteurs
-    },
-    {
         path: '/authors/create',
         name: 'create-author',
         component: AuthorForm, // Vue pour créer un auteur
+    },
+    {
+        path: '/authors/:id',
+        name: 'author-detail',
+        component: AuthorDetail, // Vue pour afficher la liste des auteurs
     },
     {
         path: '/authors/:id/edit',
