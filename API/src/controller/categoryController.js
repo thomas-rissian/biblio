@@ -76,7 +76,7 @@ const deleteCategory = async (req, res) =>
 const deleteCategoryAndManageBooks = async (req, res) =>
     handleRequest(req, res, async () => {
         const id = parseInt(req.url.split('/')[2]);
-        await categoryDAO.deleteCategoryAndManageBooks(id);
+        await categoryDAO.delete(id);
         res.writeHead(200);
         res.end();
     });

@@ -10,9 +10,9 @@ function formatDate(date) {
 class BookDAO {
 
     /**
-     * Récupère un livre par ID
-     * @returns {Promise<Object|null>} Liste de livre
-     * @throws {AppError} Si une erreur se produit lors de la récupération du livre
+     * Récupère tous les livres
+     * @returns {Promise<Array>} Liste de livres
+     * @throws {AppError} Si une erreur se produit lors de la récupération des livres
      */
     async getAll() {
         try {
@@ -32,7 +32,7 @@ class BookDAO {
                 publicationDate: formatDate(book.publicationDate)
             }));
         } catch (error) {
-            throw new AppError('Erreur lors de la récupération du livre', 500);
+            this.handlePrismaError(error, 'Erreur lors de la récupération des livres');
         }
     }
 
@@ -46,8 +46,9 @@ class BookDAO {
         try {
             id = parseInt(id);
             if (isNaN(id)) {
-                throw new Error('ID du livre invalide');
+                throw new AppError('ID du livre invalide.', 400);
             }
+
             const book = await prisma.book.findUnique({
                 where: {
                     id: id
@@ -61,18 +62,18 @@ class BookDAO {
                     },
                     categories: true
                 }
-
             });
+
             if (book) {
                 book.publicationDate = formatDate(book.publicationDate);
             }
 
             return book;
         } catch (error) {
-            console.error(error);
-            throw new AppError('Erreur lors de la récupération du livre', 500);
+            this.handlePrismaError(error, 'Erreur lors de la récupération du livre');
         }
     }
+
     /**
      * Crée un livre dans la base de données avec des catégories
      * @param {Book} book
@@ -81,7 +82,7 @@ class BookDAO {
      */
     async create(book) {
         try {
-            if (!(book instanceof Book) || book.validate(false).length >0) {
+            if (!(book instanceof Book) || book.validate(false).length > 0) {
                 throw new AppError("Données de livre invalides.", 400);
             }
             const categoryIds = book.categories;
@@ -102,9 +103,8 @@ class BookDAO {
                     ...categoriesConnect
                 }
             });
-
         } catch (error) {
-            throw new AppError('Erreur lors de la création du livre', 400);
+            this.handlePrismaError(error, 'Erreur lors de la création du livre');
         }
     }
 
@@ -116,9 +116,10 @@ class BookDAO {
      */
     async update(book) {
         try {
-            if (!(book instanceof Book) || book.validate(false).length >0) {
+            if (!(book instanceof Book) || book.validate(false).length > 0) {
                 throw new AppError("Données de livre invalides.", 400);
             }
+
             const validCategories = await prisma.category.findMany({
                 where: { id: { in: book.categories } },
             });
@@ -141,10 +142,7 @@ class BookDAO {
             });
 
         } catch (error) {
-            throw new AppError(
-                "Erreur lors de la mise à jour du livre",
-                error.statusCode || 500
-            );
+            this.handlePrismaError(error, "Erreur lors de la mise à jour du livre");
         }
     }
 
@@ -158,43 +156,39 @@ class BookDAO {
         try {
             id = parseInt(id);
             if (isNaN(id)) {
-                throw new Error('ID du livre invalide');
+                throw new AppError('ID du livre invalide.', 400);
             }
             const book = await this.getById(id);
             if (!book) {
-                throw new AppError("Livre non trouvé", 400);
+                throw new AppError("Livre non trouvé", 404);
             }
 
-            return await prisma.book.deleteMany({
+            return await prisma.book.delete({
                 where: { id: id },
             });
 
         } catch (error) {
-            throw new AppError(
-                "Erreur lors de la mise à jour du livre" + error.message,
-                 500
-            );
+            this.handlePrismaError(error, "Erreur lors de la suppression du livre");
         }
     }
 
     /**
      * Supprime des livres d'un auteur
      * @param {number} id
-     * @returns {Promise<Object>} Le livre supprimé
-     * @throws {AppError} Si une erreur se produit lors de la suppression du livre
+     * @returns {Promise<Object>} Le nombre de livres supprimés
+     * @throws {AppError} Si une erreur se produit lors de la suppression des livres
      */
     async deleteByAuthor(id) {
         try {
             id = parseInt(id);
             if (isNaN(id)) {
-                throw new Error('ID du livre invalide');
+                throw new AppError('ID de l\'auteur invalide.', 400);
             }
-            const result = await prisma.book.deleteMany({
+            return await prisma.book.deleteMany({
                 where: { authorId: id },
             });
-            return result.count;
         } catch (error) {
-            throw new AppError("Erreur lors de la suppression des livres de l'auteur", 500);
+            this.handlePrismaError(error, "Erreur lors de la suppression des livres de l'auteur");
         }
     }
 
@@ -202,21 +196,16 @@ class BookDAO {
      * Supprime tous les livres associés à une catégorie donnée.
      * @param {number} id - L'ID de la catégorie dont les livres doivent être supprimés.
      * @returns {Promise<void>}
-     * @throws {Error} Si une erreur se produit lors de la suppression des livres.
+     * @throws {AppError} Si une erreur se produit lors de la suppression des livres.
      */
     async deleteByCategory(id) {
         try {
             id = parseInt(id);
             if (isNaN(id)) {
-                throw new Error('ID du livre invalide');
+                throw new AppError('ID de la catégorie invalide.', 400);
             }
-            await prisma.bookCategory.deleteMany({
-                where: {
-                    categoryId: id,
-                },
-            });
 
-            await prisma.book.deleteMany({
+            return await prisma.book.deleteMany({
                 where: {
                     categories: {
                         some: {
@@ -226,32 +215,7 @@ class BookDAO {
                 },
             });
         } catch (error) {
-            throw new AppError("Erreur lors de la suppression des livres de la catégorie", 500);
-        }
-    }
-
-    async getBooksByAuthor(authorId) {
-        try {
-            authorId = parseInt(authorId);
-            if (isNaN(authorId)) {
-                throw new Error('ID du livre invalide');
-            }
-            return await prisma.book.findMany({
-                include: {
-                    author: {
-                        select: {
-                            id: true,
-                            name: true,
-                        },
-                    },
-                    categories: true
-                },
-                where: {
-                    authorId: authorId,
-                },
-            });
-        } catch (error) {
-            throw new AppError('Erreur lors de la récupération des livres de l\'auteur', 500);
+            this.handlePrismaError(error, "Erreur lors de la suppression des livres de la catégorie");
         }
     }
 
@@ -265,9 +229,11 @@ class BookDAO {
         try {
             categoryId = parseInt(categoryId);
             if (isNaN(categoryId)) {
-                throw new Error('ID du livre invalide');
+                throw new AppError('ID de la catégorie invalide.', 400);
             }
-            return await prisma.book.findMany({include: {
+
+            return await prisma.book.findMany({
+                include: {
                     author: {
                         select: {
                             id: true,
@@ -276,20 +242,33 @@ class BookDAO {
                     },
                     categories: true
                 },
-
-                where: {
-                    categories: {
-                        some: {
-                            id: categoryId,
-                        },
-                    },
-                },
+                where: { categories: { some: { id: categoryId } } },
             });
         } catch (error) {
-            throw new AppError('Erreur lors de la récupération des livres de la catégorie', 500);
+            this.handlePrismaError(error, 'Erreur lors de la récupération des livres de la catégorie.');
         }
     }
-
+    /**
+     * Gère les erreurs Prisma et les convertit en erreurs métiers.
+     * @param {Error} error - L'erreur levée par Prisma.
+     * @param {string} defaultMessage - Message par défaut pour les erreurs non spécifiées.
+     * @throws {AppError} - Une erreur personnalisée basée sur le contexte métier.
+     */
+    handlePrismaError(error, defaultMessage) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            switch (error.code) {
+                case 'P2002':
+                    throw new AppError("Une entrée avec ces données existe déjà.", 409);
+                case 'P2025':
+                    throw new AppError("Aucune correspondance trouvée pour cette requête.", 404);
+                case 'P2003':
+                    throw new AppError("Violation de contrainte de clé étrangère.", 400);
+                default:
+                    throw new AppError(defaultMessage, 500);
+            }
+        }
+        throw new AppError(defaultMessage, 500);
+    }
 }
 
 module.exports = new BookDAO();

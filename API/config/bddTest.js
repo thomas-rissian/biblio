@@ -1,132 +1,89 @@
 const { PrismaClient } = require('@prisma/client');
+
 const prisma = new PrismaClient();
 
 async function main() {
-    // Truncate les tables pour vider les données existantes
-    await prisma.book.deleteMany();          // Supprimer les livres
-    await prisma.category.deleteMany();      // Supprimer les catégories
-    await prisma.author.deleteMany();        // Supprimer les auteurs
+    // Supprimer les données existantes pour éviter les conflits
+    await prisma.book.deleteMany();
+    await prisma.author.deleteMany();
+    await prisma.category.deleteMany();
 
-    // Création de catégories avec des IDs fixes
-    const fictionCategory = await prisma.category.create({
-        data: {
-            id: 1,  // ID fixe
-            name: 'Fiction',
-        },
+    // Création des catégories
+    const categories = await prisma.category.createMany({
+        data: [
+            { id: 1, name: 'Fantasy' },
+            { id: 2, name: 'Dystopian' },
+            { id: 3, name: 'Romance' },
+            { id: 4, name: 'Classic Literature' },
+        ],
     });
 
-    const nonFictionCategory = await prisma.category.create({
-        data: {
-            id: 2,  // ID fixe
-            name: 'Non-Fiction',
-        },
+    // Création des auteurs
+    const authors = await prisma.author.createMany({
+        data: [
+            { id: 1, name: 'J.K. Rowling', birthDate: new Date('1965-07-31'), biography: 'British author, best known for the Harry Potter series.' },
+            { id: 2, name: 'George Orwell', birthDate: new Date('1903-06-25'), deathDate: new Date('1950-01-21'), biography: 'English novelist and essayist, known for "1984" and "Animal Farm".' },
+            { id: 3, name: 'Jane Austen', birthDate: new Date('1775-12-16'), deathDate: new Date('1817-07-18'), biography: 'English novelist known for "Pride and Prejudice".' },
+        ],
     });
 
-    const fantasyCategory = await prisma.category.create({
-        data: {
-            id: 3,  // ID fixe
-            name: 'Fantasy',
-        },
-    });
-
-    // Création d'auteurs avec des IDs fixes
-    const author1 = await prisma.author.create({
-        data: {
-            id: 1,  // ID fixe
-            name: 'J.K. Rowling',
-            birthDate: new Date('1965-07-31'),
-            biography: 'J.K. Rowling is the author of the Harry Potter series.',
-        },
-    });
-
-    const author2 = await prisma.author.create({
-        data: {
-            id: 2,  // ID fixe
-            name: 'George Orwell',
-            birthDate: new Date('1903-06-25'),
-            deathDate: new Date('1950-01-21'),
-            biography: 'George Orwell was an English novelist and essayist.',
-        },
-    });
-
-    const author3 = await prisma.author.create({
-        data: {
-            id: 3,  // ID fixe
-            name: 'Isaac Asimov',
-            birthDate: new Date('1920-01-02'),
-            biography: 'Isaac Asimov was an American writer and professor of biochemistry.',
-        },
-    });
-
-    // Création de livres avec des relations vers les auteurs et catégories
-    const book1 = await prisma.book.create({
-        data: {
-            id: 1,  // ID fixe
-            title: 'Harry Potter and the Sorcerer\'s Stone',
-            description: 'The first book in the Harry Potter series, where Harry discovers he is a wizard.',
-            publicationDate: new Date('1997-06-26'),
-            authorId: author1.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: fantasyCategory.id }],
+    // Création des livres avec relations directes
+    await prisma.book.createMany({
+        data: [
+            {
+                id: 1,
+                title: "Harry Potter and the Philosopher's Stone",
+                description: 'A young wizard embarks on his journey.',
+                publicationDate: new Date('1997-06-26'),
+                authorId: 1,
             },
-        },
-    });
-
-    const book2 = await prisma.book.create({
-        data: {
-            id: 2,  // ID fixe
-            title: '1984',
-            description: 'A dystopian novel by George Orwell about a totalitarian regime.',
-            publicationDate: new Date('1949-06-08'),
-            authorId: author2.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: nonFictionCategory.id }],
+            {
+                id: 2,
+                title: '1984',
+                description: 'A dystopian novel set in a totalitarian society.',
+                publicationDate: new Date('1949-06-08'),
+                authorId: 2,
             },
-        },
-    });
-
-    const book3 = await prisma.book.create({
-        data: {
-            id: 3,  // ID fixe
-            title: 'Brave New World',
-            description: 'A novel by Aldous Huxley that explores a dystopian future.',
-            publicationDate: new Date('1932-08-31'),
-            authorId: author2.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: nonFictionCategory.id }],
+            {
+                id: 3,
+                title: 'Pride and Prejudice',
+                description: 'A classic romance novel.',
+                publicationDate: new Date('1813-01-28'),
+                authorId: 3,
             },
-        },
-    });
-
-    const book4 = await prisma.book.create({
-        data: {
-            id: 4,  // ID fixe
-            title: 'Foundation',
-            description: 'A science fiction novel by Isaac Asimov that focuses on the collapse of a galactic empire.',
-            publicationDate: new Date('1951-06-01'),
-            authorId: author3.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: fantasyCategory.id }],
+            {
+                id: 4,
+                title: 'Animal Farm',
+                description: 'A satirical novella about farm animals overthrowing their owner.',
+                publicationDate: new Date('1945-08-17'),
+                authorId: 2,
             },
-        },
+        ],
     });
 
-    const book5 = await prisma.book.create({
-        data: {
-            id: 5,  // ID fixe
-            title: 'I, Robot',
-            description: 'A collection of science fiction short stories by Isaac Asimov about robots and their ethics.',
-            publicationDate: new Date('1950-12-02'),
-            authorId: author3.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: nonFictionCategory.id }],
-            },
-        },
+    // Ajout des relations entre livres et catégories
+    await prisma.book.update({
+        where: { id: 1 },
+        data: { categories: { connect: [{ id: 1 }] } },
     });
 
-    console.log('Données de test insérées avec succès!');
+    await prisma.book.update({
+        where: { id: 2 },
+        data: { categories: { connect: [{ id: 2 }, { id: 4 }] } },
+    });
+
+    await prisma.book.update({
+        where: { id: 3 },
+        data: { categories: { connect: [{ id: 3 }] } },
+    });
+
+    await prisma.book.update({
+        where: { id: 4 },
+        data: { categories: { connect: [{ id: 4 }] } },
+    });
+
+    console.log('Database has been seeded successfully!');
 }
-
 main()
     .catch(e => {
         throw e;
@@ -134,3 +91,6 @@ main()
     .finally(async () => {
         await prisma.$disconnect();
     });
+module.exports = {
+    main,
+}

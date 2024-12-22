@@ -1,141 +1,73 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient, Prisma } = require('@prisma/client');
 const prisma = new PrismaClient();
 const AppError = require('../model/AppError');
 const Categories = require("../model/Category");
+const BookDAO = require("./bookDAO");
+
 class CategoryDAO {
-    /**
-     * Récupère toutes les catégories
-     * @returns {Promise<Array>}
-     */
     async getAll() {
         return prisma.category.findMany();
     }
 
-    /**
-     * Récupère une catégori²e par son ID
-     * @param {number} id
-     * @returns {Promise<Object|null>}
-     */
     async getById(id) {
-        id = parseInt(id);
-        if (isNaN(id)) {
-            throw new AppError("ID de catégorie invalide.", 400);
-        }
-        return prisma.category.findUnique({
-            where: {id},
-        });
-    }
-
-    /**
-     * Crée une nouvelle catégorie
-     * @param {Categories} categories
-     * @returns {Promise<Object>}
-     */
-    async create(categories) {
-        if (!(categories instanceof Categories) || categories.validate(false).length >0) {
-            throw new AppError("Données de catégories invalides.", 400);
-        }
-        const data = categories.toJson();
-        return prisma.category.create({
-            data,
-        });
-    }
-
-    /**
-     * Met à jour une catégorie par son ID
-     * @param  {Categories} categories
-     * @returns {Promise<Object>}
-     */
-    async update(categories) {
-        if (!(categories instanceof Categories) || categories.validate(false).length >0) {
-            throw new AppError("Données de catégories invalides.", 400);
-        }
-        const id = parseInt(categories.id);
-        if (isNaN(id)) {
-            throw new AppError("Données ou ID de catégorie invalides.", 400);
-        }
-        const data = categories.toJson();
-        return prisma.category.update({
-            where: { id },
-            data,
-        });
-    }
-    /**
-     * Supprime une catégorie des livres, supprime également les livres qui n'ont plus d'autres catégories
-     * @param {number} categoryId - ID de la catégorie à supprimer
-     * @throws {AppError} - Si une erreur se produit
-     */
-    async deleteCategoryAndManageBooks(categoryId) {
         try {
-            categoryId = parseInt(categoryId);
-            if (isNaN(categoryId)) {
+            id = parseInt(id);
+            if (isNaN(id)) {
                 throw new AppError("ID de catégorie invalide.", 400);
             }
-
-            const booksWithCategory = await prisma.book.findMany({
-                where: {
-                    categories: {
-                        some: {
-                            id: categoryId,
-                        },
-                    },
-                },
-                include: {
-                    categories: true,
-                },
+            return prisma.category.findUnique({
+                where: { id },
             });
+        }catch (error) {
+            this.handlePrismaError(error, "Erreur lors de la récupération de la catégorie");
+        }
 
-            // Traiter chaque livre
-            for (const book of booksWithCategory) {
-                // Si le livre n'a plus aucune autre catégorie, on le supprime
-                if (book.categories.length === 1 && book.categories[0].id === categoryId) {
-                    await prisma.book.delete({
-                        where: { id: book.id },
-                    });
-                } else {
-                    // Sinon, on dissocie la catégorie du livre
-                    await prisma.book.update({
-                        where: { id: book.id },
-                        data: {
-                            categories: {
-                                disconnect: { id: categoryId },
-                            },
-                        },
-                    });
-                }
+    }
+
+    async create(categories) {
+        try {
+            if (!(categories instanceof Categories) || categories.validate(false).length > 0) {
+                throw new AppError("Données de catégories invalides.", 400);
             }
-
-            await prisma.category.delete({
-                where: { id: categoryId },
-            });
-
+            const data = categories.toJson();
+            return await prisma.category.create({ data });
         } catch (error) {
-            console.error(error);
-            if (error.code === 'P2003') {
-                throw new AppError(
-                    'Impossible de supprimer cette catégorie car elle est liée à d\'autres enregistrements.',
-                    400
-                );
-            }
-            throw new AppError('Erreur lors de la suppression de la catégorie.', 500);
+            this.handlePrismaError(error, "Erreur lors de la création de la catégorie.");
         }
     }
 
+    async update(categories) {
+        try {
+            if (!(categories instanceof Categories) || categories.validate(false).length > 0) {
+                throw new AppError("Données de catégories invalides.", 400);
+            }
 
+            const id = parseInt(categories.id);
+            if (isNaN(id)) {
+                throw new AppError("Données ou ID de catégorie invalides.", 400);
+            }
 
-    /**
-     * Supprime une catégorie par son ID
-     * @param {number} id
-     * @returns {Promise<void>}
-     */
-    async delete(id) {
-        id = parseInt(id);
-        if (isNaN(id)) {
-            throw new AppError("ID de catégorie invalide.", 400);
+            const data = categories.toJson();
+            return await prisma.category.update({
+                where: { id },
+                data,
+            });
+        } catch (error) {
+            this.handlePrismaError(error, "Erreur lors de la mise à jour de la catégorie.");
         }
-        return prisma.category.delete({
-            where: { id },
-        });
+    }
+
+    async delete(id) {
+        try {
+            id = parseInt(id);
+            if (isNaN(id)) {
+                throw new AppError("ID de catégorie invalide.", 400);
+            }
+            await BookDAO.deleteByCategory(id);
+            return await prisma.category.delete({ where: { id } });
+        } catch (error) {
+            this.handlePrismaError(error, "Erreur lors de la suppression de la catégorie.");
+        }
     }
 
     async getCategoriesBookCount() {
@@ -144,9 +76,7 @@ class CategoryDAO {
                 select: {
                     id: true,
                     name: true,
-                    _count: {
-                        select: { books: true },
-                    },
+                    _count: { select: { books: true } },
                 },
             });
 
@@ -155,10 +85,31 @@ class CategoryDAO {
                 name: category.name,
                 count: category._count.books,
             }));
-
-        }catch (error) {
-            throw new AppError('Erreur lors de la récupération du nombre de livre par catégories', 500);
+        } catch (error) {
+            throw new AppError("Erreur lors de la récupération du nombre de livres par catégories.", 500);
         }
+    }
+
+    /**
+     * Gère les erreurs Prisma et les convertit en erreurs métiers.
+     * @param {Error} error
+     * @param {string} defaultMessage
+     * @throws {AppError}
+     */
+    handlePrismaError(error, defaultMessage) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            switch (error.code) {
+                case 'P2002':
+                    throw new AppError("Une catégorie avec ces données existe déjà.", 409);
+                case 'P2025':
+                    throw new AppError("Aucune catégorie correspondante trouvée.", 404);
+                case 'P2003':
+                    throw new AppError("Contrainte de clé étrangère violée.", 400);
+                default:
+                    throw new AppError(defaultMessage, 500);
+            }
+        }
+        throw new AppError(defaultMessage, 500);
     }
 }
 

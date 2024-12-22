@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "Author" (
+CREATE TABLE "AuthorTest" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "birthDate" TIMESTAMP(3),
@@ -51,7 +51,7 @@ CREATE UNIQUE INDEX "Category_name_key" ON "Category"("name");
 CREATE INDEX "_BookCategories_B_index" ON "_BookCategories"("B");
 
 -- AddForeignKey
-ALTER TABLE "Book" ADD CONSTRAINT "Book_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "Author"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Book" ADD CONSTRAINT "Book_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "AuthorTest"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "BookCategory" ADD CONSTRAINT "BookCategory_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "Book"("id") ON DELETE CASCADE ON UPDATE CASCADE;

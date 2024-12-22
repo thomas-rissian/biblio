@@ -23,14 +23,13 @@ class Category {
             errors.push("L'ID de la catégorie est invalide.");
         }
 
-        // Vérification que le champ "name" est obligatoire et unique
         if (!this.#name) {
             errors.push("Le nom de la catégorie est obligatoire.");
         }
 
         return errors;
     }
-    toJson(includeId = true) {
+    toJson(includeId = false) {
         const json = {
             name: this.#name,
         };
