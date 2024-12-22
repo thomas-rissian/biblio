@@ -20,7 +20,7 @@ npm install -dev
 Une fois l'installation terminée, vous pouvez démarrer le projet en utilisant la commande suivante :
 
 ```bash
-npm start
+npm run run preview
 ```
 
 Cela lancera le serveur de développement et vous permettra d’accéder à l'application via votre navigateur.
