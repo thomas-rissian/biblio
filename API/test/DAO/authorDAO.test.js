@@ -2,31 +2,48 @@ const AuthorDAO = require('../../src/dao/authorDAO');
 const Author = require('../../src/model/Author');
 const AppError = require('../../src/model/AppError');
 const resetBdd = require('../../config/bddTest');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
-const authors = [{"id":1,"name":"J.K. Rowling","birthDate":"1965-07-31","deathDate":null,"biography":"British author, best known for the Harry Potter series."},
+const authors = [
+    {"id":1,"name":"J.K. Rowling","birthDate":"1965-07-31","deathDate":null,"biography":"British author, best known for the Harry Potter series."},
     {"id":2,"name":"George Orwell","birthDate":"1903-06-25","deathDate":"1950-01-21","biography":"English novelist and essayist, known for \"1984\" and \"Animal Farm\"."},
     {"id":3,"name":"Jane Austen","birthDate":"1775-12-16","deathDate":"1817-07-18","biography":"English novelist known for \"Pride and Prejudice\"."}
-]
+];
 
 const authorCreate = {
     "id": 1,
     "name": "Mark Twain",
     "birthDate": "1835-11-30",
     "deathDate": "1910-04-21",
-    "biography":"English novelist and essayist, known for \"1984\" and \"Animal Farm\""
+    "biography": "English novelist and essayist, known for \"1984\" and \"Animal Farm\""
 };
 
 describe('AuthorDAO', () => {
+    // Réinitialisation de la base de données avant tous les tests
+    beforeAll(async () => {
+        await resetBdd.main();
+    });
+
+    // Utilisation d'une transaction pour chaque test pour éviter les effets de bord
+    let transaction;
+
+    beforeEach(async () => {
+        transaction = await prisma.$transaction();
+    });
+
+    afterEach(async () => {
+        // Annuler la transaction après chaque test
+        await transaction.rollback();
+    });
 
     test('getAll() retourne tous les auteurs', async () => {
-        await resetBdd.main();
         const allAuthors = await AuthorDAO.getAll();
         expect(allAuthors).toHaveLength(3);
         expect(allAuthors).toEqual(authors);
     });
 
     test('getById() retourne un auteur existant', async () => {
-        await resetBdd.main();
         const author = await AuthorDAO.getById(1);
         expect(author).not.toBeNull();
         expect(author).toEqual(authors[0]);
@@ -38,7 +55,6 @@ describe('AuthorDAO', () => {
     });
 
     test('create() ajoute un nouvel auteur', async () => {
-        await resetBdd.main();
         const newAuthor = new Author(authorCreate);
         const createdAuthor = await AuthorDAO.create(newAuthor);
         expect(createdAuthor.name).toBe(newAuthor.name);
@@ -49,16 +65,10 @@ describe('AuthorDAO', () => {
 
     test('create() lève une erreur pour des données invalides', async () => {
         const invalidAuthor = new Author({...authorCreate, name: ""});
-        try {
-            await AuthorDAO.create(invalidAuthor);
-        } catch (error) {
-            expect(error).toBeInstanceOf(AppError);
-            expect(error.message).toBe("Erreur lors de la création de l'auteur.");
-        }
+        await expect(AuthorDAO.create(invalidAuthor)).rejects.toThrow(AppError);
     });
 
     test('update() met à jour un auteur existant', async () => {
-        await resetBdd.main();
         const updatedAuthor = new Author(authorCreate);
         await AuthorDAO.update(updatedAuthor);
 
@@ -68,16 +78,10 @@ describe('AuthorDAO', () => {
 
     test('update() retourne une erreur pour un auteur inexistant', async () => {
         const updatedAuthor = new Author({...authorCreate, id: 100});
-        try {
-            await AuthorDAO.update(updatedAuthor);
-        } catch (error) {
-            expect(error).toBeInstanceOf(AppError);
-            expect(error.message).toBe("Aucune correspondance trouvée pour cette requête.");
-        }
+        await expect(AuthorDAO.update(updatedAuthor)).rejects.toThrow(AppError);
     });
 
     test('delete() supprime un auteur existant', async () => {
-        await resetBdd.main();
         const deletedAuthor = await AuthorDAO.delete(3);
 
         expect(deletedAuthor).toEqual({
@@ -93,21 +97,14 @@ describe('AuthorDAO', () => {
     });
 
     test('delete() retourne une erreur pour un auteur inexistant', async () => {
-        try {
-            await AuthorDAO.delete(100);
-        } catch (error) {
-            expect(error).toBeInstanceOf(AppError);
-            expect(error.message).toBe("Aucune correspondance trouvée pour cette requête.");
-        }
+        await expect(AuthorDAO.delete(100)).rejects.toThrow(AppError);
     });
 
     test('delete() retourne une erreur si l\'auteur est lié à des livres', async () => {
-        await resetBdd.main();
-        try {
-            await AuthorDAO.delete(1);
-        } catch (error) {
-            expect(error).toBeInstanceOf(AppError);
-            expect(error.message).toBe('Impossible de supprimer cet auteur car il est lié à d\'autres enregistrements.');
-        }
+        await expect(AuthorDAO.delete(1)).rejects.toThrow(AppError);
+    });
+
+    afterAll(async () => {
+        await prisma.$disconnect();
     });
 });

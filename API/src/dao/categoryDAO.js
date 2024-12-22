@@ -109,7 +109,7 @@ class CategoryDAO {
                     throw new AppError(defaultMessage, 500);
             }
         }
-        throw new AppError(defaultMessage, 500);
+        throw new AppError(defaultMessage, 400);
     }
 }
 

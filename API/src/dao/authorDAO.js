@@ -19,7 +19,6 @@ class AuthorDAO {
     async create(author) {
         try {
             if (!(author instanceof Author) || author.validate(false).length > 0) {
-                console.log(author.validate(false));
                 throw new AppError("Données d'auteur invalides.", 400);
             }
             const authorData = author.toJson(false);
@@ -142,7 +141,7 @@ class AuthorDAO {
                     throw new AppError(defaultMessage, 500);
             }
         }
-        throw new AppError(defaultMessage, 500);
+        throw new AppError(defaultMessage, 400);
     }
 }
 

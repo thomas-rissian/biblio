@@ -248,6 +248,27 @@ class BookDAO {
             this.handlePrismaError(error, 'Erreur lors de la récupération des livres de la catégorie.');
         }
     }
+    async getBooksByAuthor(authorId) {
+        try {
+            authorId = parseInt(authorId);
+            return await prisma.book.findMany({
+                include: {
+                    author: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
+                    categories: true
+                },
+                where: {
+                    authorId: authorId,
+                },
+            });
+        } catch (error) {
+            this.handlePrismaError(error, 'Erreur lors de la récupération des livres de l\'auteur.');
+        }
+    }
     /**
      * Gère les erreurs Prisma et les convertit en erreurs métiers.
      * @param {Error} error - L'erreur levée par Prisma.
@@ -267,7 +288,7 @@ class BookDAO {
                     throw new AppError(defaultMessage, 500);
             }
         }
-        throw new AppError(defaultMessage, 500);
+        throw new AppError(defaultMessage, 400);
     }
 }
 

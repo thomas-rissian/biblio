@@ -1,5 +1,6 @@
 const categoryDAO = require('../dao/categoryDAO');
 const Category = require('../model/Category');
+const AppError = require("../model/AppError");
 
 const handleRequest = async (req, res, callback) => {
     try {
@@ -46,11 +47,9 @@ const createCategory = async (req, res) =>
         const body = await readRequestBody(req);
         const data = JSON.parse(body);
         const category = new Category(data);
-        if(category.validate(false  ).length===0){
-            const newCategory = await categoryDAO.create(category);
-            res.writeHead(201, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(newCategory));
-        }
+        const newCategory = await categoryDAO.create(category);
+        res.writeHead(201, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(newCategory));
 
 });
 

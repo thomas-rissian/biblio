@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model AuthorTest {
+model Author {
   id        Int       @id @default(autoincrement())
   name      String
   birthDate DateTime?
@@ -28,6 +28,6 @@ model Book {
   description     String
   publicationDate DateTime
   authorId        Int
-  author          AuthorTest @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author          Author     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   categories      Category[] @relation("BookCategories")
 }

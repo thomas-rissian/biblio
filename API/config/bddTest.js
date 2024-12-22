@@ -1,14 +1,39 @@
 const { PrismaClient } = require('@prisma/client');
-
 const prisma = new PrismaClient();
+const fs = require('fs');
+
+async function resetSequences() {
+    // Réinitialiser les séquences d'auto-incrémentation
+    await prisma.$executeRaw`ALTER SEQUENCE "Category_id_seq" RESTART WITH 1`;
+    await prisma.$executeRaw`ALTER SEQUENCE "Author_id_seq" RESTART WITH 1`;
+    await prisma.$executeRaw`ALTER SEQUENCE "Book_id_seq" RESTART WITH 1`;
+}
 
 async function main() {
+    // Vérifier si l'environnement est de type test
+    if (process.env.NODE_ENV === 'test') {
+        // Supprimer le fichier SQLite existant (optionnel)
+        if (fs.existsSync('./test.db')) {
+            fs.unlinkSync('./test.db');
+        }
+
+        // Utiliser la base de données SQLite pour les tests
+        process.env.DATABASE_URL = process.env.DATABASE_URL_TEST;
+    }
+
+    // Se reconnecter à Prisma après avoir modifié l'URL
+    await prisma.$disconnect();
+    await prisma.$connect();
+
     // Supprimer les données existantes pour éviter les conflits
     await prisma.book.deleteMany();
     await prisma.author.deleteMany();
     await prisma.category.deleteMany();
 
-    // Création des catégories
+    // Réinitialiser les séquences d'auto-incrémentation
+    await resetSequences();
+
+    // Création des catégories avec des IDs fixes
     const categories = await prisma.category.createMany({
         data: [
             { id: 1, name: 'Fantasy' },
@@ -18,7 +43,7 @@ async function main() {
         ],
     });
 
-    // Création des auteurs
+    // Création des auteurs avec des IDs fixes
     const authors = await prisma.author.createMany({
         data: [
             { id: 1, name: 'J.K. Rowling', birthDate: new Date('1965-07-31'), biography: 'British author, best known for the Harry Potter series.' },
@@ -27,7 +52,7 @@ async function main() {
         ],
     });
 
-    // Création des livres avec relations directes
+    // Création des livres avec des IDs fixes
     await prisma.book.createMany({
         data: [
             {
@@ -61,29 +86,40 @@ async function main() {
         ],
     });
 
-    // Ajout des relations entre livres et catégories
-    await prisma.book.update({
-        where: { id: 1 },
-        data: { categories: { connect: [{ id: 1 }] } },
-    });
+    // Ajout des relations entre livres et catégories après création
+    const category1 = await prisma.category.findUnique({ where: { id: 1 } });
+    const category2 = await prisma.category.findUnique({ where: { id: 2 } });
+    const category3 = await prisma.category.findUnique({ where: { id: 3 } });
+    const category4 = await prisma.category.findUnique({ where: { id: 4 } });
 
-    await prisma.book.update({
-        where: { id: 2 },
-        data: { categories: { connect: [{ id: 2 }, { id: 4 }] } },
-    });
+    // Vérifie si les catégories existent avant de les connecter
+    if (category1 && category2 && category3 && category4) {
+        await prisma.book.update({
+            where: { id: 1 },
+            data: { categories: { connect: [{ id: 1 }] } },
+        });
 
-    await prisma.book.update({
-        where: { id: 3 },
-        data: { categories: { connect: [{ id: 3 }] } },
-    });
+        await prisma.book.update({
+            where: { id: 2 },
+            data: { categories: { connect: [{ id: 2 }, { id: 4 }] } },
+        });
 
-    await prisma.book.update({
-        where: { id: 4 },
-        data: { categories: { connect: [{ id: 4 }] } },
-    });
+        await prisma.book.update({
+            where: { id: 3 },
+            data: { categories: { connect: [{ id: 3 }] } },
+        });
+
+        await prisma.book.update({
+            where: { id: 4 },
+            data: { categories: { connect: [{ id: 4 }] } },
+        });
+    } else {
+        console.log("Une ou plusieurs catégories manquent");
+    }
 
     console.log('Database has been seeded successfully!');
 }
+
 main()
     .catch(e => {
         throw e;
@@ -91,6 +127,7 @@ main()
     .finally(async () => {
         await prisma.$disconnect();
     });
+
 module.exports = {
     main,
-}
+};
