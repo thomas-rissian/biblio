@@ -41,6 +41,7 @@ describe('BookDAO', () => {
     test('create() ajoute une nouvelle livre', async () => {
         await resetBdd.main();
         const newBook =bookCreate;
+        newBook.name = "test";
         const book = new Book(newBook);
         const createdCategory = await BookDAO.create(book);
         expect(createdCategory.name).toBe(book[0]);

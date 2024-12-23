@@ -19,6 +19,7 @@ class AuthorDAO {
     async create(author) {
         try {
             if (!(author instanceof Author) || author.validate(false).length > 0) {
+                console.log(author);
                 throw new AppError("Données d'auteur invalides.", 400);
             }
             const authorData = author.toJson(false);

@@ -2,27 +2,9 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const fs = require('fs');
 
-async function resetSequences() {
-    // Réinitialiser les séquences d'auto-incrémentation
-    await prisma.$executeRaw`ALTER SEQUENCE "Category_id_seq" RESTART WITH 1`;
-    await prisma.$executeRaw`ALTER SEQUENCE "Author_id_seq" RESTART WITH 1`;
-    await prisma.$executeRaw`ALTER SEQUENCE "Book_id_seq" RESTART WITH 1`;
-}
 
 async function main() {
-    // Vérifier si l'environnement est de type test
-    if (process.env.NODE_ENV === 'test') {
-        // Supprimer le fichier SQLite existant (optionnel)
-        if (fs.existsSync('./test.db')) {
-            fs.unlinkSync('./test.db');
-        }
 
-        // Utiliser la base de données SQLite pour les tests
-        process.env.DATABASE_URL = process.env.DATABASE_URL_TEST;
-    }
-
-    // Se reconnecter à Prisma après avoir modifié l'URL
-    await prisma.$disconnect();
     await prisma.$connect();
 
     // Supprimer les données existantes pour éviter les conflits
@@ -30,8 +12,6 @@ async function main() {
     await prisma.author.deleteMany();
     await prisma.category.deleteMany();
 
-    // Réinitialiser les séquences d'auto-incrémentation
-    await resetSequences();
 
     // Création des catégories avec des IDs fixes
     const categories = await prisma.category.createMany({
@@ -118,7 +98,7 @@ async function main() {
     }
 
     console.log('Database has been seeded successfully!');
-}
+};
 
 main()
     .catch(e => {
