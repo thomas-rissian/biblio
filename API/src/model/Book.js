@@ -8,7 +8,7 @@ class Book {
     #publicationDate = null;
     #description = null;
     #categories = []; // Nouveau champ pour les catégories
-
+    #error = [];
     /**
      * @param {{ id?: number, title: string, authorId: number, publicationDate?: Date, description?: string, categoryIds?: number[] }} data
      */
@@ -50,29 +50,35 @@ class Book {
      * @param {boolean} isUpdate - Indique si c'est une mise à jour
      * @returns {string[]} - Liste des erreurs
      */
-    validate(isUpdate) {
-        const errors = [];
+    validate(isUpdate = true) {
+       this.#error = [];
 
         if (isUpdate && (this.#id === null || isNaN(this.#id))) {
-            errors.push("L'ID du livre est invalide.");
+            this.#error.push({ id: "L'ID du livre est invalide." });
         }
 
-        if (!this.#title || this.#title.length === 0) {
-            errors.push("Le titre du livre est obligatoire.");
+        if (!this.#title || this.#title.trim().length === 0) {
+            this.#error.push({ title: "Le titre du livre est obligatoire." });
+        }
+        if (!this.#author || isNaN(this.#author)) {
+            this.#error.push({ author: "L'auteur du livre est obligatoire et doit être un identifiant valide." });
         }
 
-        if (!this.#author) {
-            errors.push("L'auteur du livre est obligatoire.");
+        if (!this.#publicationDate || isNaN(this.#publicationDate.getTime())) {
+            this.#error.push({ publicationDate: "La date de publication est obligatoire et doit être une date valide." });
         }
 
-        // Vérifier que les catégories sont des identifiants valides
-        if (!Array.isArray(this.#categories) || this.#categories.length === 0 ) {
-            errors.push("Les catégories sont obligatoires.");
+        if (!this.#description || this.#description.trim().length === 0) {
+            this.#error.push({ description: "La description du livre est obligatoire." });
+        }
+
+        if (!Array.isArray(this.#categories) || this.#categories.length === 0) {
+            this.#error.push({ categories: "Les catégories sont obligatoires et doivent contenir au moins une catégorie." });
         } else if (this.#categories.some(id => isNaN(id))) {
-            errors.push("Certains identifiants de catégorie sont invalides.");
+            this.#error.push({ categories: "Tous les identifiants des catégories doivent être valides." });
         }
 
-        return errors;
+        return this.#error;
     }
 
     /**

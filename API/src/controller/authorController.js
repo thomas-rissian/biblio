@@ -21,7 +21,6 @@ const getAllAuthors = async (req, res) => handleRequest(req, res, async() => {
 const createAuthor = async (req, res) => handleRequest(req, res, async () => {
         const body = await readRequestBody(req);
         const data = JSON.parse(body);
-
         const newAuthor = await authorDAO.create(new Author(data));
         res.writeHead(201, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(newAuthor));
@@ -44,7 +43,6 @@ const updateAuthor = async (req, res) =>  handleRequest(req, res, async () => {
     const body = await readRequestBody(req);
     const data = JSON.parse(body);
     data.id = parseInt(req.url.split('/')[2]);
-
     const updatedAuthor = await authorDAO.update(new Author(data));
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(updatedAuthor));

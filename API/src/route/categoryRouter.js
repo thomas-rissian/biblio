@@ -10,14 +10,6 @@ const routes = [
         }
     },
     {
-        // Affiche une catégorie spécifique par ID
-        pattern: /^\/categories\/(\d+)$/,
-        method: 'GET',
-        handler: (req, res) => {
-            categoryController.getOneCategory(req, res);
-        }
-    },
-    {
         // Crée une nouvelle catégorie
         pattern: /^\/categories$/,
         method: 'POST',
@@ -34,13 +26,30 @@ const routes = [
         }
     },
     {
+        // Récupère le nombre de livre par catégories
+        pattern: /^\/categories\/books\/count$/,
+        method: 'GET',
+        handler: (req, res) => {
+            categoryController.countBooksCategories(req, res);
+        }
+    },
+    {
+        // Affiche une catégorie spécifique par ID
+        pattern: /^\/categories\/(\d+)$/,
+        method: 'GET',
+        handler: (req, res) => {
+            categoryController.getOneCategory(req, res);
+        }
+    },
+    {
         // Supprime une catégorie spécifique par ID et ses livres associés
         pattern: /^\/categories\/(\d+)$/,
         method: 'DELETE',
         handler: (req, res) => {
-            categoryController.deleteCategoryAndManageBooks(req, res);
+            categoryController.deleteCategory(req, res);
         }
     },
+
 ];
 
 module.exports = routes;

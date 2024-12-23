@@ -39,14 +39,22 @@ class Author {
     validate(isUpdate = true) {
         const errors = [];
 
-        // Si c'est une mise à jour, vérifier que l'ID est valide
         if (isUpdate && (this.#id === null || isNaN(this.#id))) {
-            errors.push("L'ID de l'auteur est invalide.");
+            errors.push({ id: "L'ID de l'auteur est invalide." });
         }
 
-        // Vérification que le champ "name" est obligatoire
-        if (!this.#name ||this.#name.length === 0) {
-            errors.push("Le nom de l'auteur est obligatoire.");
+        if (!this.#name || this.#name.trim().length === 0) {
+            errors.push({ name: "Le nom de l'auteur est obligatoire." });
+        }
+        if (!this.#biography || this.#biography.trim().length === 0) {
+            errors.push({ biography: "La biographie de l'auteur est obligatoire." });
+        }
+        if (this.#birthDate && isNaN(this.#birthDate.getTime()) || !this.#birthDate) {
+            errors.push({ birthDate: "La date de naissance est invalide." });
+        }
+
+        if (this.#birthDate && this.#deathDate && this.#deathDate < this.#birthDate) {
+            errors.push({ deathDate: "La date de décès ne peut pas être antérieure à la date de naissance." });
         }
 
         return errors;

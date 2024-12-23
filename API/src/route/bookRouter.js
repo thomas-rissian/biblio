@@ -45,14 +45,6 @@ const bookRoutes = [
         }
     },
     {
-        pattern: /^\/books\/category\/([^/]+)$/,  // Gère '/books/category/:categoryId' en DELETE pour supprimer tous les livres d'une catégorie
-        method: 'DELETE',
-        handler: (req, res, match) => {
-            const categoryName = match[1];
-            bookController.deleteBooksByCategory(req, res, categoryName);
-        }
-    },
-    {
         pattern: /^\/books\/author\/(\d+)$/, // Gère '/books/author/:authorId' en GET pour lister les livres d'un auteur
         method: 'GET',
         handler: (req, res, match) => {
@@ -60,13 +52,20 @@ const bookRoutes = [
         },
     },
     {
-        pattern: /^\/books\/category\/(\d+)$/, // Gère '/books/category/:categoryId' en GET pour lister les livres d'une catégorie
+        pattern: /^\/books\/categories\/([^/]+)$/,  // Gère '/books/category/:categoryId' en DELETE pour supprimer tous les livres d'une catégorie
+        method: 'DELETE',
+        handler: (req, res, match) => {
+            const categoryName = match[1];
+            bookController.deleteBooksByCategory(req, res, categoryName);
+        }
+    },
+    {
+        pattern: /^\/books\/categories\/(\d+)$/, // Gère '/books/category/:categoryId' en GET pour lister les livres d'une catégorie
         method: 'GET',
         handler: (req, res, match) => {
             bookController.getBooksByCategory(req, res);
         },
     },
-
 
 
 ];

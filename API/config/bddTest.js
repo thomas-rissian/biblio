@@ -1,171 +1,104 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const fs = require('fs');
+
 
 async function main() {
-    // Truncate les tables pour vider les données existantes
-    await prisma.bookCategory.deleteMany();  // Supprimer les entrées dans la table de relation BookCategory
-    await prisma.book.deleteMany();          // Supprimer les livres
-    await prisma.category.deleteMany();      // Supprimer les catégories
-    await prisma.author.deleteMany();        // Supprimer les auteurs
 
-    // Création de catégories
-    const fictionCategory = await prisma.category.create({
-        data: {
-            name: 'Fiction',
-        },
+    await prisma.$connect();
+
+    // Supprimer les données existantes pour éviter les conflits
+    await prisma.book.deleteMany();
+    await prisma.author.deleteMany();
+    await prisma.category.deleteMany();
+
+
+    // Création des catégories avec des IDs fixes
+    const categories = await prisma.category.createMany({
+        data: [
+            { id: 1, name: 'Fantasy' },
+            { id: 2, name: 'Dystopian' },
+            { id: 3, name: 'Romance' },
+            { id: 4, name: 'Classic Literature' },
+        ],
     });
 
-    const nonFictionCategory = await prisma.category.create({
-        data: {
-            name: 'Non-Fiction',
-        },
+    // Création des auteurs avec des IDs fixes
+    const authors = await prisma.author.createMany({
+        data: [
+            { id: 1, name: 'J.K. Rowling', birthDate: new Date('1965-07-31'), biography: 'British author, best known for the Harry Potter series.' },
+            { id: 2, name: 'George Orwell', birthDate: new Date('1903-06-25'), deathDate: new Date('1950-01-21'), biography: 'English novelist and essayist, known for "1984" and "Animal Farm".' },
+            { id: 3, name: 'Jane Austen', birthDate: new Date('1775-12-16'), deathDate: new Date('1817-07-18'), biography: 'English novelist known for "Pride and Prejudice".' },
+        ],
     });
 
-    const fantasyCategory = await prisma.category.create({
-        data: {
-            name: 'Fantasy',
-        },
-    });
-
-    // Création d'auteurs
-    const author1 = await prisma.author.create({
-        data: {
-            name: 'J.K. Rowling',
-            birthDate: new Date('1965-07-31'),
-            biography: 'J.K. Rowling is the author of the Harry Potter series.',
-        },
-    });
-
-    const author2 = await prisma.author.create({
-        data: {
-            name: 'George Orwell',
-            birthDate: new Date('1903-06-25'),
-            deathDate: new Date('1950-01-21'),
-            biography: 'George Orwell was an English novelist and essayist.',
-        },
-    });
-
-    const author3 = await prisma.author.create({
-        data: {
-            name: 'Isaac Asimov',
-            birthDate: new Date('1920-01-02'),
-            biography: 'Isaac Asimov was an American writer and professor of biochemistry.',
-        },
-    });
-
-    // Création de livres avec des relations vers les auteurs et catégories
-    const book1 = await prisma.book.create({
-        data: {
-            title: 'Harry Potter and the Sorcerer\'s Stone',
-            publicationDate: new Date('1997-06-26'),
-            authorId: author1.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: fantasyCategory.id }],
+    // Création des livres avec des IDs fixes
+    await prisma.book.createMany({
+        data: [
+            {
+                id: 1,
+                title: "Harry Potter and the Philosopher's Stone",
+                description: 'A young wizard embarks on his journey.',
+                publicationDate: new Date('1997-06-26'),
+                authorId: 1,
             },
-        },
-    });
-
-    const book2 = await prisma.book.create({
-        data: {
-            title: '1984',
-            publicationDate: new Date('1949-06-08'),
-            authorId: author2.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: nonFictionCategory.id }],
+            {
+                id: 2,
+                title: '1984',
+                description: 'A dystopian novel set in a totalitarian society.',
+                publicationDate: new Date('1949-06-08'),
+                authorId: 2,
             },
-        },
-    });
-
-    const book3 = await prisma.book.create({
-        data: {
-            title: 'Brave New World',
-            publicationDate: new Date('1932-08-31'),
-            authorId: author2.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: nonFictionCategory.id }],
+            {
+                id: 3,
+                title: 'Pride and Prejudice',
+                description: 'A classic romance novel.',
+                publicationDate: new Date('1813-01-28'),
+                authorId: 3,
             },
-        },
-    });
-
-    const book4 = await prisma.book.create({
-        data: {
-            title: 'Foundation',
-            publicationDate: new Date('1951-06-01'),
-            authorId: author3.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: fantasyCategory.id }],
+            {
+                id: 4,
+                title: 'Animal Farm',
+                description: 'A satirical novella about farm animals overthrowing their owner.',
+                publicationDate: new Date('1945-08-17'),
+                authorId: 2,
             },
-        },
+        ],
     });
 
-    const book5 = await prisma.book.create({
-        data: {
-            title: 'I, Robot',
-            publicationDate: new Date('1950-12-02'),
-            authorId: author3.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: nonFictionCategory.id }],
-            },
-        },
-    });
+    // Ajout des relations entre livres et catégories après création
+    const category1 = await prisma.category.findUnique({ where: { id: 1 } });
+    const category2 = await prisma.category.findUnique({ where: { id: 2 } });
+    const category3 = await prisma.category.findUnique({ where: { id: 3 } });
+    const category4 = await prisma.category.findUnique({ where: { id: 4 } });
 
-    const book6 = await prisma.book.create({
-        data: {
-            title: 'The Hobbit',
-            publicationDate: new Date('1937-09-21'),
-            authorId: author1.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: fantasyCategory.id }],
-            },
-        },
-    });
+    // Vérifie si les catégories existent avant de les connecter
+    if (category1 && category2 && category3 && category4) {
+        await prisma.book.update({
+            where: { id: 1 },
+            data: { categories: { connect: [{ id: 1 }] } },
+        });
 
-    const book7 = await prisma.book.create({
-        data: {
-            title: 'The Road',
-            publicationDate: new Date('2006-09-26'),
-            authorId: author2.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: nonFictionCategory.id }],
-            },
-        },
-    });
+        await prisma.book.update({
+            where: { id: 2 },
+            data: { categories: { connect: [{ id: 2 }, { id: 4 }] } },
+        });
 
-    const book8 = await prisma.book.create({
-        data: {
-            title: 'The Man in the High Castle',
-            publicationDate: new Date('1962-11-17'),
-            authorId: author3.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: fantasyCategory.id }],
-            },
-        },
-    });
+        await prisma.book.update({
+            where: { id: 3 },
+            data: { categories: { connect: [{ id: 3 }] } },
+        });
 
-    const book9 = await prisma.book.create({
-        data: {
-            title: 'The Left Hand of Darkness',
-            publicationDate: new Date('1969-03-01'),
-            authorId: author3.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: fantasyCategory.id }],
-            },
-        },
-    });
+        await prisma.book.update({
+            where: { id: 4 },
+            data: { categories: { connect: [{ id: 4 }] } },
+        });
+    } else {
+        console.log("Une ou plusieurs catégories manquent");
+    }
 
-    const book10 = await prisma.book.create({
-        data: {
-            title: 'The Dispossessed',
-            publicationDate: new Date('1974-03-01'),
-            authorId: author3.id,
-            categories: {
-                connect: [{ id: fictionCategory.id }, { id: fantasyCategory.id }],
-            },
-        },
-    });
-
-    console.log('Données de test insérées avec succès!');
-}
+    console.log('Database has been seeded successfully!');
+};
 
 main()
     .catch(e => {
@@ -174,3 +107,7 @@ main()
     .finally(async () => {
         await prisma.$disconnect();
     });
+
+module.exports = {
+    main,
+};

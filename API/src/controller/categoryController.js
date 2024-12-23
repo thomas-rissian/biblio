@@ -1,5 +1,6 @@
 const categoryDAO = require('../dao/categoryDAO');
 const Category = require('../model/Category');
+const AppError = require("../model/AppError");
 
 const handleRequest = async (req, res, callback) => {
     try {
@@ -45,11 +46,12 @@ const createCategory = async (req, res) =>
     handleRequest(req, res, async () => {
         const body = await readRequestBody(req);
         const data = JSON.parse(body);
-
-        const newCategory = await categoryDAO.create(new Category(data));
+        const category = new Category(data);
+        const newCategory = await categoryDAO.create(category);
         res.writeHead(201, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(newCategory));
-    });
+
+});
 
 const updateCategory = async (req, res) =>
     handleRequest(req, res, async () => {
@@ -57,11 +59,11 @@ const updateCategory = async (req, res) =>
         const body = await readRequestBody(req);
         const data = JSON.parse(body);
         data.id = id;
-        const updatedCategory = await categoryDAO.update(new Category(data));
+        const categories = new Category(data);
+        const updatedCategory = await categoryDAO.update(categories);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(updatedCategory));
     });
-
 const deleteCategory = async (req, res) =>
     handleRequest(req, res, async () => {
         const id = parseInt(req.url.split('/')[2]);
@@ -73,16 +75,22 @@ const deleteCategory = async (req, res) =>
 const deleteCategoryAndManageBooks = async (req, res) =>
     handleRequest(req, res, async () => {
         const id = parseInt(req.url.split('/')[2]);
-        await categoryDAO.deleteCategoryAndManageBooks(id);
+        await categoryDAO.delete(id);
         res.writeHead(200);
         res.end();
     });
-
+const countBooksCategories = async (req, res) =>
+    handleRequest(req, res, async () => {
+       const categories = await categoryDAO.getCategoriesBookCount();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(categories));
+    });
 module.exports = {
     getAllCategories,
     getOneCategory,
     createCategory,
     updateCategory,
     deleteCategory,
-    deleteCategoryAndManageBooks
+    deleteCategoryAndManageBooks,
+    countBooksCategories
 };

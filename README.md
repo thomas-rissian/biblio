@@ -17,9 +17,9 @@ Cette séparation des responsabilités entre l'API et le serveur web garantit un
 ### Ports par défaut
 
 - **API Biblio** : Accessible sur le **port 40000**.
-- **Serveur Web** : Accessible sur le **port 40080**.
+- **Serveur Web** : Accessible sur le **port 5173**.
 
-Ces valeurs peuvent être modifiées si nécessaire dans les fichiers de configuration respectifs.
+Le port de l'API peut-être modifier dans le fichier index.js
 
 ### Guides de configuration
 
@@ -27,3 +27,5 @@ Chaque serveur dispose de son propre fichier `README` situé dans son dossier ra
 - Installer les dépendances,
 - Configurer l'environnement,
 - Démarrer
+
+Mais un guide d'installation et d'utilisation est disponible dans /doc.

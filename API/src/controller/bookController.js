@@ -32,13 +32,7 @@ const getOneBook = (req, res, id) => handleRequest(req, res, async () => {
 const createBook = (req, res) => handleRequest(req, res, async () => {
     const body = await readRequestBody(req);
     const data = JSON.parse(body);
-
     const bookModel = new BookModel(data);
-    const validationErrors = bookModel.validate(false);
-
-    if (validationErrors.length > 0) {
-        throw new AppError(validationErrors.join(", "), 400);
-    }
     const book = await bookDAO.create(bookModel);
     res.writeHead(201, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(book));
@@ -105,7 +99,7 @@ const deleteBooksByCategory = (req, res) => handleRequest(req, res, async () => 
         throw new AppError('Id de la catégorie manquant', 400);
     }
     const deletedBooks = await bookDAO.deleteByCategory(categoryId);
-    if (deletedBooks === 0) {
+    if (!deletedBooks) {
         throw new AppError('Aucun livre trouvé pour cette catégorie', 404);
     }
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -155,7 +149,6 @@ const getBooksByAuthor = async (req, res) => {
     res.writeHead(200, {'Content-Type': 'application/json'});
     res.end(JSON.stringify(books));
 };
-
 const readRequestBody = (req) => new Promise((resolve, reject) => {
     let body = '';
     req.on('data', chunk => {
@@ -174,5 +167,5 @@ module.exports = {
     deleteBooksByCategory,
     deleteBooksByAuthor,
     getBooksByAuthor,
-    getBooksByCategory
+    getBooksByCategory,
 };

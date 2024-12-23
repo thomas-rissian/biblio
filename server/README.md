@@ -15,18 +15,20 @@ npm install
 
 ---
 
+Allez dans `/src/config/config.js` pour modifier l'accès à l'API.
+
 ## Lancement de l'application
 
 Une fois l'installation terminée, vous pouvez démarrer le projet en utilisant la commande suivante :
 
 ```bash
-npm start
+npm run dev
 ```
 
 Cela lancera le serveur de développement et vous permettra d’accéder à l'application via votre navigateur.
 
 Le site web est disponile à l'adresse suivante :  
-   [http://localhost:40080](http://localhost:40080)
+   [http://localhost:5173](http://localhost:5173)
 
 ---
 
