@@ -2,53 +2,49 @@ import { Component, Input, OnInit, forwardRef, ChangeDetectorRef, OnChanges, Sim
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
-import { AuthorsService } from '../../core/service/author.service';
+import { CategoriesService } from '../../core/service/categorie.service';
 
 @Component({
-  selector: 'app-author-select',
+  selector: 'app-category-select',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './author-select.html',
+  templateUrl: './category-select.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => AuthorSelect),
+      useExisting: forwardRef(() => CategorySelect),
       multi: true,
     },
   ],
 })
-export class AuthorSelect implements ControlValueAccessor, OnInit, OnChanges {
-  @Input() title: string = 'Auteur';
+export class CategorySelect implements ControlValueAccessor, OnInit, OnChanges {
+  @Input() title: string = 'Categorie';
   @Input() readonly: boolean = false;
-  @Input() externalAuthors?: any[];
-  authors: any[] = [];
+  @Input() externalCategories?: any[];
+  categories: any[] = [];
   selectedId?: number | null = null;
   disabled = false;
 
   private onChange = (_: any) => {};
   private onTouched = () => {};
 
-  constructor(private authorsService: AuthorsService, private cd: ChangeDetectorRef) {}
+  constructor(private categoriesService: CategoriesService, private cd: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    
-    if (this.externalAuthors && this.externalAuthors.length) {
-      this.authors = this.externalAuthors;
+    if (this.externalCategories && this.externalCategories.length) {
+      this.categories = this.externalCategories;
     } else {
-      this.authorsService.getAuthors(1, 1000).subscribe({ next: (list) => {
-        this.authors = list;
-        
+      this.categoriesService.getCategories(1, 1000).subscribe({ next: (list) => {
+        this.categories = list;
         try { this.cd.detectChanges(); } catch (e) {}
       }});
     }
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    
-    if (changes['externalAuthors'] && Array.isArray(changes['externalAuthors'].currentValue)) {
-      this.authors = changes['externalAuthors'].currentValue ?? [];
+    if (changes['externalCategories'] && Array.isArray(changes['externalCategories'].currentValue)) {
+      this.categories = changes['externalCategories'].currentValue ?? [];
     }
-    
     try { this.cd.detectChanges(); } catch (e) {}
   }
 
@@ -56,7 +52,6 @@ export class AuthorSelect implements ControlValueAccessor, OnInit, OnChanges {
     const num = obj === null || obj === undefined || obj === '' ? null : Number(obj);
     this.selectedId = Number.isNaN(num) ? null : num;
     try { this.cd.detectChanges(); } catch (e) {}
-    
   }
 
   registerOnChange(fn: any): void {
@@ -77,9 +72,9 @@ export class AuthorSelect implements ControlValueAccessor, OnInit, OnChanges {
     this.onChange(idNum);
   }
 
-  get selectedAuthorName(): string | undefined {
+  get selectedCategoryName(): string | undefined {
     const id = this.selectedId === null ? null : Number(this.selectedId);
-    const a = this.authors?.find((x: any) => Number(x.id) === Number(id));
-    return a ? (a.name ?? `${a.firstName ?? ''} ${a.lastName ?? ''}`.trim()) : undefined;
+    const c = this.categories?.find((x: any) => Number(x.id) === Number(id));
+    return c ? (c.name ?? `${c.name ?? ''}`.trim()) : undefined;
   }
 }

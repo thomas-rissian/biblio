@@ -34,7 +34,6 @@ export class AuthorForm implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // If no author was provided via Input, check the route params and load the author from the API
     if (!this.author) {
       const idParam = this.route.snapshot.paramMap.get('id');
       if (idParam) {
@@ -52,7 +51,6 @@ export class AuthorForm implements OnInit, AfterViewInit {
               });
             },
             error: () => {
-              // on error, navigate back to authors list
               this.router.navigate(['/authors']);
             }
           });
@@ -79,13 +77,13 @@ export class AuthorForm implements OnInit, AfterViewInit {
       deathDate: raw.deathDate ? new Date(raw.deathDate) : null,
       biography: raw.biography,
     });
-    // If there's a parent listening to save, use that (embedded mode)
+    
     if (this.save.observers && this.save.observers.length > 0) {
       this.save.emit(author);
       return;
     }
 
-    // Otherwise, handle save directly (routed mode)
+    
     const call$ = author.id ? this.authorsService.updateAuthor(author.id, author) : this.authorsService.createAuthor(author);
     call$.subscribe({
       next: () => {
@@ -99,7 +97,7 @@ export class AuthorForm implements OnInit, AfterViewInit {
 
   onCancel() {
     this.cancel.emit();
-    // if we're in a routed context, go back to the authors list
+    
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.router.navigate(['/authors']);

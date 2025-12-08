@@ -17,7 +17,7 @@ export class BookModel {
   publicationDate: Date | null;
   description: string;
   categoryIds: number[];
-  // optional relational fields
+  
   categories?: CategoryModel[];
   author?: AuthorModel | null;
 

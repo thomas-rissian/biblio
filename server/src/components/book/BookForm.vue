@@ -152,7 +152,6 @@ export default {
         }
         this.$router.push('/books');
       } catch (error) {
-        console.error("Erreur lors de l'enregistrement du livre:", error);
         this.formErrors.global = ['Une erreur s\'est produite lors de l\'enregistrement du livre.'];
       }
     },

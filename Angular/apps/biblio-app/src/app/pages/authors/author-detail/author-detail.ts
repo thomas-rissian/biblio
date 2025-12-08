@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthorsService } from '@biblio-app/core/service/author.service';
 import { timeout, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { Loader } from '../../../../../../../libs/ui/loader/loader';
+import { Loader } from '@libs/ui/loader/loader';
 import { ViewChild } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { BooksService } from '@biblio-app/core/service/book.service';
@@ -23,6 +23,7 @@ export class AuthorDetail implements OnInit, OnDestroy {
   books: BookModel[] = [];
   error?: string;
   loading: boolean = false;
+  booksLoading: boolean = false;
   @ViewChild(Loader, { static: true }) loader!: Loader;
 
   private sub: any;
@@ -36,15 +37,21 @@ export class AuthorDetail implements OnInit, OnDestroy {
       if (isNaN(id)) { this.router.navigate(['/authors']); return; }
       this.loading = true; this.author = undefined; this.error = undefined; this.books = [];
       try { this.loader?.show?.(); } catch(e) {}
-      console.debug('AuthorDetail: param change, id=', idParam);
+      
       this.authorsService.getAuthorById(id).pipe(timeout(5000), catchError(() => of(null)), finalize(() => { this.loading = false; try { this.loader?.hide?.(); this.cd.detectChanges(); } catch (e) {} })).subscribe({
-        next: (a) => { if (a) { console.debug('AuthorDetail: fetched author=', a); this.author = Object.assign({}, a); try { this.cd.detectChanges(); } catch (e) {} } else { this.error = 'Erreur lors du chargement (timeout)'; console.debug('AuthorDetail: got null author'); } },
-        error: (err) => { this.error = 'Auteur introuvable'; console.error('AuthorDetail: error fetching author', err); }
+        next: (a) => { if (a) { this.author = Object.assign({}, a); try { this.cd.detectChanges(); } catch (e) {} } else { this.error = 'Erreur lors du chargement (timeout)'; } },
+        error: (err) => { this.error = 'Auteur introuvable'; }
       });
-      // load books for author
-      this.booksService.getBooksByAuthor(id).subscribe({
-        next: (items) => { this.books = items; },
-        error: () => { /* ignore; optional */ }
+      this.booksLoading = true;
+      this.books = [];
+      this.books = [];
+      this.booksService.getBooksByAuthor(id).pipe(
+        timeout(5000),
+        catchError(() => of([] as BookModel[])),
+        finalize(() => { this.booksLoading = false; try { this.cd.detectChanges(); } catch (e) {} })
+      ).subscribe({
+        next: (items) => { this.books = items ?? []; try { this.cd.detectChanges(); } catch (e) {} },
+        error: () => {}
       });
     });
   }

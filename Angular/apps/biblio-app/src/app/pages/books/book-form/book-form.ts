@@ -53,37 +53,35 @@ export class BookForm implements OnInit, OnDestroy {
       categoryIds: [this.book?.categoryIds ?? []],
     });
 
-    // load authors and categories list
-    // The author-select component also loads authors itself, but keep it here if the form needs a local list
+    
     this.authorsService.getAuthors(1, 100).pipe(takeUntil(this.destroy$)).subscribe((list) => { this.authors = list; this.authorsLoaded = true; try { this.cd.detectChanges(); } catch (e) {};
-      // If a book is already loaded, re-apply the authorId control value to force the AuthorSelect to show
+      
       if (this.book) {
-        try { this.form.get('authorId')?.setValue(this.book.authorId ?? null); } catch(e) { console.error('Failed to update authorId control', e); }
-        // if authors list doesn't contain the book author, fetch and append to authors so the select can display it
+        try { this.form.get('authorId')?.setValue(this.book.authorId ?? null); } catch(e) { }
+        
         const aid = this.book.authorId ?? null;
         if (aid && !this.authors.some(a => Number(a.id) === Number(aid))) {
-          this.authorsService.getAuthorById(aid).pipe(takeUntil(this.destroy$)).subscribe({ next: (a) => { if (a) { this.authors = [a, ...this.authors]; try { this.cd.detectChanges(); } catch (e) {} } }, error: (err) => { console.error('Author fetch for authorId fallback failed', err); } });
+          this.authorsService.getAuthorById(aid).pipe(takeUntil(this.destroy$)).subscribe({ next: (a) => { if (a) { this.authors = [a, ...this.authors]; try { this.cd.detectChanges(); } catch (e) {} } }, error: (err) => { } });
         }
       }
-      console.debug('Authors loaded count=', this.authors.length);
+      
     });
     this.categoriesService.getCategories(1, 100).pipe(takeUntil(this.destroy$)).subscribe((list) => { this.categories = list; this.categoriesLoaded = true; try { this.cd.detectChanges(); } catch (e) {}
-      // If a book is loaded, re-apply the categoryIds to trigger ControlValueAccessor writeValue
+    
       if (this.book) {
-        try { this.form.get('categoryIds')?.setValue(this.book.categoryIds ?? []); } catch(e) { console.error('Failed to update categoryIds control', e); }
-        // ensure categories list contains all selected categories; if not, fetch missing ones and append
+        try { this.form.get('categoryIds')?.setValue(this.book.categoryIds ?? []); } catch(e) { }
+        
         const missing = (this.book.categoryIds ?? []).filter((cid: any) => !this.categories.some((c: any) => Number(c.id) === Number(cid)));
         if (missing && missing.length > 0) {
           missing.forEach((cid: any) => {
-            this.categoriesService.getCategoryById(cid).pipe(takeUntil(this.destroy$)).subscribe({ next: (c) => { if (c) { this.categories = [c, ...this.categories]; try { this.cd.detectChanges(); } catch (e) {} } }, error: (err) => { console.error('Category fetch fallback failed', err); } });
+            this.categoriesService.getCategoryById(cid).pipe(takeUntil(this.destroy$)).subscribe({ next: (c) => { if (c) { this.categories = [c, ...this.categories]; try { this.cd.detectChanges(); } catch (e) {} } }, error: (err) => { } });
           });
         }
       }
-      console.debug('Categories loaded count=', this.categories.length);
+      
     });
 
-    // If no book passed via @Input, check route param 'id' and load it
-    // subscribe to route param changes so the form adapts when clicking same route or update
+    
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       const idParam = params.get('id');
       if (idParam) {
@@ -121,12 +119,12 @@ export class BookForm implements OnInit, OnDestroy {
       description: b.description ?? '',
       categoryIds: b.categoryIds ?? [],
     });
-    // explicitly set controls and force CD so custom controls reflect values right away
+    
     try { this.form.get('authorId')?.setValue(b.authorId ?? null); } catch (e) {}
     try { this.form.get('categoryIds')?.setValue(b.categoryIds ?? []); } catch (e) {}
     try { this.cd.detectChanges(); } catch (e) {}
-    // log for debug
-    console.debug('Book loaded and form patched; authorId=', b.authorId, 'categoryIds=', b.categoryIds, 'authorsLoaded=', this.authorsLoaded, 'categoriesLoaded=', this.categoriesLoaded);
+    
+    
   }
 
   toISO(date: Date | string | undefined | null) {

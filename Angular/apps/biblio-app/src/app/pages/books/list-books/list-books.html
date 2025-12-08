@@ -1,17 +1,18 @@
 <div class="p-4">
   <div class="mb-4">
-    <button class="px-3 py-1 bg-green-600 text-white rounded" (click)="goToCreate()">Créer</button>
+    <div class="flex gap-2 items-center">
+      <button class="px-3 py-1 bg-green-600 text-white rounded" (click)="goToCreate()">Créer</button>
+      <app-text-field type="text" placeholder="Recherche titre..." title="Titre" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange($event)"></app-text-field>
+      <app-author-select [(ngModel)]="filterAuthor" [externalAuthors]="authors" title="Auteur" (ngModelChange)="onFilterChange()"></app-author-select>
+      <app-category-select [(ngModel)]="filterCategory" [externalCategories]="categories" title="Categorie" (ngModelChange)="onFilterChange()"></app-category-select>
+    </div>
   </div>
   <app-list
     [title]="'Books'"
     [itemKey]="'title'"
     [list]="books"
     [serverSide]="true"
-    [pageSize]="pageSize"
-    [page]="page"
-    [totalCount]="totalCount"
-    [showControls]="true"
-    (pageChange)="onPageChange($event)"
+    [showControls]="false"
     (editMode)="onEdit($event)"
     (detailMode)="onDetail($event)"
     (removeMode)="onRemove($event)">

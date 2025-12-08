@@ -27,7 +27,6 @@ app.use('/api/v1/authors', authorRouter);
 app.use('/api/v1/categories', categoryRouter);
 
 app.use((err, req, res, next) => {
-  console.error(err);
   res.status(500).json({ message: 'Internal Server Error' });
 });
 
@@ -37,9 +36,7 @@ app.use((req, res) => {
 
 let server;
 if (process.env.NODE_ENV !== 'test') {
-  server = app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}/api/v1`);
-  });
+  server = app.listen(PORT, () => {});
 }
 
 process.on('SIGINT', async () => {

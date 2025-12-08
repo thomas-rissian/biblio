@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Loader } from '../../../../../../../libs/ui/loader/loader';
+import { Loader } from '@libs/ui/loader/loader';
 import { ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BooksService } from '@biblio-app/core/service/book.service';
@@ -34,10 +34,9 @@ export class BookDetail implements OnInit, OnDestroy {
       if (isNaN(id)) { this.router.navigate(['/books']); return; }
       this.loading = true; this.book = undefined; this.error = undefined;
       try { this.loader?.show?.(); } catch(e) {}
-      console.debug('BookDetail: param change, id=', idParam);
       this.booksService.getBookById(id).pipe(timeout(5000), catchError((err) => of(null)), finalize(() => { this.loading = false; try { this.loader?.hide?.(); this.cd.detectChanges(); } catch (e) {} })).subscribe({
-        next: (b) => { if (b) { console.debug('BookDetail: fetched book=', b); this.book = Object.assign({}, b); try { this.cd.detectChanges(); } catch (e) {} } else { this.error = 'Erreur lors du chargement (timeout)'; console.debug('BookDetail: got null book'); } },
-        error: (err) => { this.error = 'Livre introuvable'; console.error('BookDetail: error fetching book', err); }
+        next: (b) => { if (b) { this.book = Object.assign({}, b); try { this.cd.detectChanges(); } catch (e) {} } else { this.error = 'Erreur lors du chargement (timeout)'; } },
+        error: (err) => { this.error = 'Livre introuvable'; }
       });
     });
   }
@@ -53,11 +52,11 @@ export class BookDetail implements OnInit, OnDestroy {
   reload() {
     const id = this.book?.id;
     if (!id) return;
-    console.debug('BookDetail: manual reload id=', id);
+    
     this.loading = true;
     this.booksService.getBookById(id).pipe(timeout(5000), catchError((err) => of(null)), finalize(() => { this.loading = false; try { this.cd.detectChanges(); } catch (e) {} })).subscribe({
-      next: (b) => { if (b) { console.debug('BookDetail.reload: fetched=', b); this.book = Object.assign({}, b); try { this.cd.detectChanges(); } catch (e) {} } else { this.error = 'Erreur lors du chargement (timeout)'; } },
-      error: (err) => { this.error = 'Livre introuvable'; console.error('BookDetail.reload: error', err); }
+      next: (b) => { if (b) { this.book = Object.assign({}, b); try { this.cd.detectChanges(); } catch (e) {} } else { this.error = 'Erreur lors du chargement (timeout)'; } },
+      error: (err) => { this.error = 'Livre introuvable'; }
     });
   }
 }

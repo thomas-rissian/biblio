@@ -5,7 +5,7 @@
     <div class="list-controls flex items-center space-x-4" *ngIf="showControls">
       <label class="text-sm text-gray-600 flex items-center">
         <span class="mr-2">Items par page:</span>
-        <select class="form-select block w-24 px-2 py-1 border rounded bg-white text-sm" [value]="pageSize" (change)="setPageSize($any($event.target).valueAsNumber)">
+        <select class="form-select block w-24 px-2 py-1 border rounded bg-white text-sm" [value]="pageSize" (change)="onPageSizeChange($event)">
           <option *ngFor="let s of pageSizeOptions" [value]="s">{{ s }}</option>
         </select>
       </label>
@@ -31,7 +31,7 @@
   <app-list-pagination *ngIf="showControls" [page]="page" [pageSize]="pageSize" [totalItems]="totalItems" [isLastPage]="isLastPage" [serverSide]="serverSide" (pageChange)="goToPage($event.page)"></app-list-pagination>
 
   <ng-container *ngIf="!serverSide || (serverSide && totalCount !== undefined)">
-    <ng-container *ngFor="let p of [].constructor(totalPages); let idx = index">
+    <ng-container *ngFor="let p of range(totalPages); let idx = index">
       <button type="button" class="px-2 py-1 rounded hover:bg-gray-50" [class.bg-gray-100]="page === (idx + 1)" (click)="goToPage(idx + 1)">{{ idx + 1 }}</button>
     </ng-container>
   </ng-container>

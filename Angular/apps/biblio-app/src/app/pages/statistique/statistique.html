@@ -1,0 +1,46 @@
+<div class="p-4">
+  <app-loader *ngIf="loading"></app-loader>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white p-4 rounded shadow">
+      <div class="text-sm text-gray-500">Nombre total de livres</div>
+      <div class="text-lg font-semibold">{{ totalBooks }}</div>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+      <div class="text-sm text-gray-500">Nombre total d'auteurs</div>
+      <div class="text-lg font-semibold">{{ totalAuthors }}</div>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+      <div class="text-sm text-gray-500">Nombre de catégories</div>
+      <div class="text-lg font-semibold">{{ totalCategories }}</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+    <div class="bg-white p-4 rounded shadow">
+      <div class="flex justify-between items-center">
+        <div>
+          <div class="text-sm text-gray-500">Nombre de livres par catégorie</div>
+          <div class="text-lg font-semibold">{{ totalBooks }}</div>
+        </div>
+        <div *ngIf="loading" class="text-xs text-gray-400">Chargement…</div>
+      </div>
+      <div class="mt-2">
+        <div id="booksByCategoryChart" style="width:100%; height:260px;"></div>
+      </div>
+    </div>
+
+    <div class="bg-white p-4 rounded shadow">
+      <div class="flex justify-between items-center">
+        <div>
+          <div class="text-sm text-gray-500">Répartition des livres</div>
+        </div>
+        <div *ngIf="loading" class="text-xs text-gray-400">Chargement…</div>
+      </div>
+      <div class="mt-2">
+        <div id="categoryPieChart" style="width:100%; height:260px;"></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

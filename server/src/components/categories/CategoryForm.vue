@@ -49,9 +49,8 @@ export default {
   },
   methods: {
     // Valider le champ de la catégorie
-    validateField() {
+      validateField() {
       const categoryModel = new Category(this.category);
-      console.log(typeof this.category.id);
       const errors = categoryModel.validate(this.category.id !== undefined);
 
       // Réinitialiser les erreurs
@@ -81,7 +80,6 @@ export default {
         }
         this.$router.push('/categories');
       } catch (error) {
-        console.error("Erreur lors de l'enregistrement de la catégorie:", error);
         this.formErrors.global = ['Une erreur s\'est produite lors de l\'enregistrement de la catégorie.'];
       }
     },

@@ -13,12 +13,13 @@ const BASE_URL = API_URL + '/categories';
 export class CategoriesService {
 	constructor(private http: HttpClient) {}
 
-	getCategories(page?: number, pageSize?: number): Observable<CategoryModel[]> {
+	getCategories(page?: number, pageSize?: number, q?: string): Observable<CategoryModel[]> {
 		let params = undefined as HttpParams | undefined;
 		if (page !== undefined || pageSize !== undefined) {
 			params = new HttpParams();
 			if (page !== undefined) params = params.set('page', String(page));
 			if (pageSize !== undefined) params = params.set('pageSize', String(pageSize));
+			if (q !== undefined && q !== '') params = params.set('q', String(q));
 		}
 		return this.http.get<any>(BASE_URL, params ? { params } : undefined).pipe(
 			map((resp: any) => {
@@ -53,23 +54,6 @@ export class CategoriesService {
 	countBookCategories(): Observable<number> {
 		return this.http.get(`${BASE_URL}/books/count`).pipe(
 			map((res: any) => (typeof res === 'number' ? res : (res?.count ?? 0)))
-		);
-	}
-    
-	getCategoriesWithMeta(page?: number, pageSize?: number): Observable<{ items: CategoryModel[]; meta?: { total: number; page?: number; pageSize?: number; totalPages?: number } }> {
-		let params = undefined as HttpParams | undefined;
-		if (page !== undefined || pageSize !== undefined) {
-			params = new HttpParams();
-			if (page !== undefined) params = params.set('page', String(page));
-			if (pageSize !== undefined) params = params.set('pageSize', String(pageSize));
-		}
-
-		return this.http.get<any>(BASE_URL, params ? { params } : undefined).pipe(
-			map((resp: any) => {
-				const list = Array.isArray(resp) ? resp : (resp?.items ?? resp);
-				const meta = resp?.meta;
-				return { items: (list || []).map((it: any) => CategoryModel.fromDto(it)), meta };
-			})
 		);
 	}
 

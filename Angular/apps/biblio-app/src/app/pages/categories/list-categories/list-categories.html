@@ -1,21 +1,21 @@
 <div class="p-4">
   <div class="mb-4">
-    <button class="px-3 py-1 bg-green-600 text-white rounded" (click)="goToCreate()">Créer</button>
+    <div class="flex gap-2 items-center">
+      <button class="px-3 py-1 bg-green-600 text-white rounded" (click)="goToCreate()">Créer</button>
+      <app-text-field type="text" placeholder="Recherche..." title="Recherche" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange($event)"></app-text-field>
+    </div>
   </div>
   <app-list
     [title]="'Categories'"
     [itemKey]="'name'"
     [list]="categories"
     [serverSide]="true"
-    [pageSize]="pageSize"
-    [page]="page"
-    [totalCount]="totalCount"
-    [showControls]="true"
-    (pageChange)="onPageChange($event)"
+    [showControls]="false"
     (editMode)="onEdit($event)"
     (detailMode)="onDetail($event)"
     (removeMode)="onRemove($event)">
   </app-list>
   <app-loader/>
+  <div *ngIf="error" class="mt-4 text-sm text-red-600">{{ error }}</div>
   <div *ngIf="error" class="mt-4 text-sm text-red-600">{{ error }}</div>
 </div>

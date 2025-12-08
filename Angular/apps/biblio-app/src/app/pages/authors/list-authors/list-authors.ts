@@ -2,34 +2,43 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { LibList as List } from '../../../../../../../libs/ui/components/list/list';
+import { TextField } from '@libs/ui/inputs/textField/textField';
+import { FormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { AuthorForm } from '../author-form/author-form';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, lastValueFrom } from 'rxjs';
 import { AuthorModel } from '../../../model';
 import { AuthorsService } from '@biblio-app/core/service/author.service';
-import { Loader } from '../../../../../../../libs/ui/loader/loader';
+import { Loader } from '@libs/ui/loader/loader';
 
 @Component({
   selector: 'app-list-authors',
   standalone: true,
-  imports: [CommonModule, List, Loader, AuthorForm],
+  imports: [CommonModule, List, Loader, AuthorForm, FormsModule, TextField],
   templateUrl: './list-authors.html',
 })
 export class ListAuthors implements OnInit, OnDestroy {
   @ViewChild(Loader, { static: true }) loader!: Loader;
   authors: AuthorModel[] = [];
+  allAuthors: AuthorModel[] = [];
+  filteredAuthors: AuthorModel[] = [];
   page: number = 1;
   pageSize: number = 10;
   totalCount?: number;
   error?: string;
 
   private destroy$ = new Subject<void>();
+  searchTerm: string = '';
+  public search$ = new Subject<string>();
+  onSearchChange(v: string) { this.search$.next(v); }
 
   constructor(private authorsService: AuthorsService, private changeDetectorRef: ChangeDetectorRef, private router: Router) {}
   showCreate: boolean = false;
   editingAuthor?: AuthorModel;
 
   ngOnInit(): void {
-    this.loadPage(this.page);
+    this.search$.pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$)).subscribe(v => { this.searchTerm = v; this.applyFiltersAndLoadPage(1); });
+    this.loadAllData().then(() => this.applyFiltersAndLoadPage(this.page));
   }
 
   ngOnDestroy(): void {
@@ -41,36 +50,41 @@ export class ListAuthors implements OnInit, OnDestroy {
     this.router.navigate(['/authors', 'create']);
   }
 
-  loadPage(page: number) {
+  async loadAllData(): Promise<void> {
     this.loader?.show?.();
     this.error = undefined;
-    this.authorsService.getAuthorsWithMeta(page, this.pageSize)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (resp) => {
-          this.authors = resp.items;
-          this.totalCount = resp.meta?.total;
-          // prefer server-provided page/pageSize if present
-          this.page = resp.meta?.page ?? page;
-          this.pageSize = resp.meta?.pageSize ?? this.pageSize;
-          this.loader?.hide?.();
-          this.changeDetectorRef.detectChanges();
-        },
-        error: (err) => {
-          this.authors = [];
-          this.error = err?.message ?? 'Erreur lors du chargement des auteurs';
-          this.loader?.hide?.();
-        }
-      });
+    try {
+      const authors = await lastValueFrom(this.authorsService.getAuthors().pipe(takeUntil(this.destroy$)));
+      this.allAuthors = authors ?? [];
+    } catch (err: any) {
+      this.allAuthors = [];
+      this.error = err?.message ?? 'Erreur lors du chargement des auteurs';
+    } finally {
+      this.loader?.hide?.();
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
-  onPageChange(event: { page: number; pageSize: number }) {
-    this.pageSize = event.pageSize;
-    this.loadPage(event.page);
+  applyFilters() {
+    const q = this.searchTerm?.trim().toLowerCase();
+    let list = [...this.allAuthors];
+    if (q && q.length > 0) {
+      list = list.filter(a => (a.name ?? '').toLowerCase().includes(q));
+    }
+    this.filteredAuthors = list;
+    this.totalCount = list.length;
   }
+
+  applyFiltersAndLoadPage(page: number) {
+    this.applyFilters();
+    this.page = page;
+    this.authors = [...this.filteredAuthors];
+    this.changeDetectorRef.detectChanges();
+  }
+
+  
 
   onEdit(id: number) {
-    // navigate to routed author form for editing
     this.router.navigate(['/authors', id, 'edit']);
   }
 
@@ -84,7 +98,7 @@ export class ListAuthors implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.loadPage(this.page);
+          this.loadAllData().then(() => this.applyFiltersAndLoadPage(1));
         },
         error: (err) => {
           this.loader?.hide?.();
@@ -99,9 +113,8 @@ export class ListAuthors implements OnInit, OnDestroy {
       next: (a) => {
       this.showCreate = false;
       this.editingAuthor = undefined;
-        // if we came from a routed form, navigate back to authors list
         this.router.navigate(['/authors']);
-        this.loadPage(this.page);
+        
       },
       error: (err) => { this.error = err?.message ?? 'Erreur création'; }
     });

@@ -7,7 +7,6 @@ const handleRequest = async (req, res, callback) => {
     try {
         await callback(req, res);
     } catch (error) {
-        console.error('Erreur dans le contrôleur :', error);
         const statusCode = error.statusCode || 500;
         res.status(statusCode).json({ message: error.message || 'Erreur interne du serveur' });
     }
@@ -119,7 +118,6 @@ const getBooksByCategory = async (req, res) => {
 
         res.status(200).json(books);
     } catch (error) {
-        console.error('Erreur dans le contrôleur :', error);
         const statusCode = error.statusCode || 500;
         res.status(statusCode).json({ message: error.message || 'Erreur interne du serveur' });
     }
@@ -141,7 +139,6 @@ const getBooksByAuthor = async (req, res) => {
 
         res.status(200).json(books);
     } catch (error) {
-        console.error('Erreur dans le contrôleur :', error);
         const statusCode = error.statusCode || 500;
         res.status(statusCode).json({ message: error.message || 'Erreur interne du serveur' });
     }

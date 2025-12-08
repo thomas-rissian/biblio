@@ -128,7 +128,6 @@ export default {
         }
         this.$router.push('/authors');
       } catch (error) {
-        console.error("Erreur lors de l'enregistrement de l'auteur:", error);
         this.formErrors.global = ['Une erreur s\'est produite lors de l\'enregistrement de l\'auteur.'];
       }
     },

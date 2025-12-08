@@ -41,7 +41,6 @@ class CategoryDAO {
             const data = categories.toJson();
             return await prisma.category.create({ data });
         } catch (error) {
-            console.error('Create error:', error.message, error.code);
             throw this.handlePrismaError(error, "Erreur lors de la création de la catégorie.");
         }
     }
@@ -63,7 +62,6 @@ class CategoryDAO {
                 data,
             });
         } catch (error) {
-            console.error('Update error:', error.message, error.code);
             throw this.handlePrismaError(error, "Erreur lors de la mise à jour de la catégorie.");
         }
     }
@@ -84,7 +82,6 @@ class CategoryDAO {
             await bookDAO.deleteByCategory(id);
             return await prisma.category.delete({ where: { id } });
         } catch (error) {
-            console.error('Delete error:', error.message, error.code);
             throw this.handlePrismaError(error, "Erreur lors de la suppression de la catégorie.");
         }
     }

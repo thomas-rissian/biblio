@@ -6,9 +6,9 @@
     "analytics": false
   },
   "newProjectRoot": "projects",
-  "defaultProject": "angular",
+  "defaultProject": "biblio-app",
   "projects": {
-    "angular": {
+    "biblio-app": {
       "projectType": "application",
       "schematics": {},
       "root": "apps/biblio-app",
@@ -60,10 +60,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "angular:build:production"
+              "buildTarget": "biblio-app:build:production"
             },
             "development": {
-              "buildTarget": "angular:build:development"
+              "buildTarget": "biblio-app:build:development"
             }
           },
           "defaultConfiguration": "development"

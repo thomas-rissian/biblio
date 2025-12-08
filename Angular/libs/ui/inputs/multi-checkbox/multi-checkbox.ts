@@ -30,7 +30,7 @@ export class MultiCheckbox implements ControlValueAccessor, OnChanges {
 
   writeValue(obj: any): void {
     this.value = Array.isArray(obj) ? obj.map((v) => (v === null ? v : Number(v))) : [];
-    console.debug('MultiCheckbox writeValue called; value=', this.value);
+    
     try { this.cd.detectChanges(); } catch (e) {}
   }
 
@@ -64,6 +64,6 @@ export class MultiCheckbox implements ControlValueAccessor, OnChanges {
     this.onChange(this.value);
     this.onTouched();
     try { this.cd.detectChanges(); } catch (e) {}
-    console.debug('MultiCheckbox toggle id=', id, 'checked=', checked, 'current=', this.value);
+    
   }
 }

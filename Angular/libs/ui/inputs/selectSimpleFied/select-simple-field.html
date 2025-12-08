@@ -19,6 +19,8 @@
             @for (key of paramData; track key) {
               {{ value[key] }}&nbsp;
             }
+          } @else if (value && typeof value === 'object') {
+            {{ value.name || value.title || value.id || value }}
           } @else {
             {{ value }}
           }
@@ -49,8 +51,10 @@
             (click)="selectItem(item)">
             @if (paramData.length && item && typeof item === 'object') {
               @for (key of paramData; track key) {
-                {{ item }}&nbsp;
+                {{ item[key] }}&nbsp;
               }
+            } @else if (item && typeof item === 'object') {
+              {{ item.name || item.title || item.id || item }}
             } @else {
               {{ item }}
             }

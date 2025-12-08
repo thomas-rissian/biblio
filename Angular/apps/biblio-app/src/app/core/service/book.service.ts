@@ -12,12 +12,13 @@ const BASE_URL = API_URL + '/books';
 export class BooksService {
 	constructor(private http: HttpClient) {}
 
-	getBooks(page?: number, pageSize?: number): Observable<BookModel[]> {
+	getBooks(page?: number, pageSize?: number, q?: string): Observable<BookModel[]> {
 		let params = undefined as HttpParams | undefined;
 		if (page !== undefined || pageSize !== undefined) {
 			params = new HttpParams();
 			if (page !== undefined) params = params.set('page', String(page));
 			if (pageSize !== undefined) params = params.set('pageSize', String(pageSize));
+			if (q !== undefined && q !== '') params = params.set('q', String(q));
 		}
 		return this.http.get<any>(BASE_URL, params ? { params } : undefined).pipe(
 				map((resp: any) => {
@@ -27,26 +28,10 @@ export class BooksService {
 			);
 	}
 
-	getBooksWithMeta(page?: number, pageSize?: number): Observable<{ items: BookModel[]; meta?: { total: number; page?: number; pageSize?: number; totalPages?: number } }> {
-		let params = undefined as HttpParams | undefined;
-		if (page !== undefined || pageSize !== undefined) {
-			params = new HttpParams();
-			if (page !== undefined) params = params.set('page', String(page));
-			if (pageSize !== undefined) params = params.set('pageSize', String(pageSize));
-		}
-		return this.http.get<any>(BASE_URL, params ? { params } : undefined).pipe(
-				map((resp: any) => {
-					const list = Array.isArray(resp) ? resp : (resp?.items ?? resp);
-					const meta = resp?.meta;
-					return { items: (list || []).map((it: any) => BookModel.fromDto(it)), meta };
-				})
-			);
-	}
-
 	getBookById(id: number): Observable<BookModel> {
 		return this.http.get(`${BASE_URL}/${id}`).pipe(
 			map((item: any) => {
-				console.debug('BooksService.getBookById: response', item);
+            
 				return BookModel.fromDto(item);
 			})
 		);

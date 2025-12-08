@@ -13,12 +13,13 @@ export class AuthorsService {
 
     constructor(private http: HttpClient) {}
 
-    getAuthors(page: number = 1, pageSize: number = 10): Observable<AuthorModel[]> {
+    getAuthors(page: number = 1, pageSize: number = 10, q?: string): Observable<AuthorModel[]> {
       let params = undefined as HttpParams | undefined;
       if (page !== undefined || pageSize !== undefined) {
         params = new HttpParams();
         if (page !== undefined) params = params.set('page', String(page));
         if (pageSize !== undefined) params = params.set('pageSize', String(pageSize));
+        if (q !== undefined && q !== '') params = params.set('q', String(q));
       }
       return this.http.get<any>(BASE_URL, params ? { params } : undefined).pipe(
         map((resp: any) => {
@@ -26,24 +27,7 @@ export class AuthorsService {
           return (list || []).map((item: any) => AuthorModel.fromDto(item));
         })
       );
-    }
-
-    getAuthorsWithMeta(page: number = 1, pageSize: number = 10): Observable<{ items: AuthorModel[]; meta?: { total: number; page?: number; pageSize?: number; totalPages?: number } }> {
-      let params = undefined as HttpParams | undefined;
-      if (page !== undefined || pageSize !== undefined) {
-        params = new HttpParams();
-        if (page !== undefined) params = params.set('page', String(page));
-        if (pageSize !== undefined) params = params.set('pageSize', String(pageSize));
-      }
-      return this.http.get<any>(BASE_URL, params ? { params } : undefined).pipe(
-        map((resp: any) => {
-          const list = Array.isArray(resp) ? resp : (resp?.items ?? resp);
-          const meta = resp?.meta;
-          return { items: (list || []).map((it: any) => AuthorModel.fromDto(it)), meta };
-        })
-      );
-    }
-    
+    }        
     getAuthorById(id: number): Observable<AuthorModel> {
       return this.http.get(`${BASE_URL}/${id}`).pipe(
         map((item: any) => AuthorModel.fromDto(item))

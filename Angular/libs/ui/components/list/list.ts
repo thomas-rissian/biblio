@@ -21,7 +21,7 @@ export class LibList implements OnChanges {
   @Input() pageSizeOptions: number[] = [5, 10, 25];
   @Input() pageSize: number = 10;
   @Input() initialPage: number = 1;
-  @Input() showControls: boolean = true;
+  @Input() showControls: boolean = false;
   @Input() noDataMessage: string = 'Aucun élément';
   @Input() itemTemplate?: TemplateRef<any>;
   @Input() serverSide: boolean = false;
@@ -59,7 +59,15 @@ export class LibList implements OnChanges {
   }
 
   get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
+    const size = (this.pageSize && this.pageSize > 0) ? this.pageSize : 10;
+    const pages = Math.ceil(this.totalItems / size);
+    const safePages = Number.isFinite(pages) ? Math.max(1, Math.min(10000, pages)) : 1;
+    return safePages;
+  }
+
+  range(count: number): number[] {
+    const c = Math.max(0, Math.min(10000, Math.floor(count || 0)));
+    return Array.from({ length: c }, (_, i) => i + 1);
   }
 
   get paginatedItems(): any[] {
@@ -82,7 +90,21 @@ export class LibList implements OnChanges {
   prevPage() { this.goToPage(this.page - 1); }
   firstPage() { this.goToPage(1); }
   lastPage() { this.goToPage(this.totalPages); }
-  setPageSize(size: number) { this.pageSize = size; this.page = Math.min(this.page, this.totalPages); this.emitPageChange(); }
+  setPageSize(size: number) {
+    const s = Number(size);
+    if (isNaN(s) || s <= 0) {
+      
+    }
+    this.pageSize = (!isNaN(s) && s > 0) ? s : 10;
+    this.page = Math.min(this.page, this.totalPages);
+    this.emitPageChange();
+  }
+
+  onPageSizeChange(event: Event) {
+    const sizeStr = (event.target as HTMLSelectElement)?.value;
+    const s = Number(sizeStr);
+    this.setPageSize(s);
+  }
   trackByFn(index: number, item: any) { if (!item) return index; if (item.id !== undefined) return item.id; if (this.itemKey && item[this.itemKey] !== undefined) return item[this.itemKey]; return index; }
   private getItemId(item: any, indexInPage: number): number { if (!item) return indexInPage; const indexGlobal = (this.page - 1) * this.pageSize + indexInPage; if (item.id !== undefined) return item.id; if (this.itemKey && item[this.itemKey] !== undefined) return item[this.itemKey]; return indexGlobal; }
   edit(id: number | string) { this.editMode.emit(id as any); }

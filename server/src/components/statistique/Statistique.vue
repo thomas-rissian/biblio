@@ -21,7 +21,7 @@ export default {
     try {
       this.datas = await countBookCategories();
     } catch (error) {
-      console.error("Erreur lors de la récupération des données:", error);
+      // error handled - keep user-friendly behavior
     }
   }
 };

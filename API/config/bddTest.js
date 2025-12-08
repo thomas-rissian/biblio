@@ -11,11 +11,9 @@ async function main() {
     // Clear DB tables and reset sequences
     try {
         // Log tables (debug)
-        try {
+            try {
             const tables = await prisma.$queryRawUnsafe("SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname='public'");
-            console.log('[bddTest] Tables in DB:', tables.map(t => t.tablename));
         } catch (e) {
-            console.warn('[bddTest] Could not list tables:', e.message);
         }
 
             // Retry TRUNCATE a few times in case of transient deadlocks
@@ -24,10 +22,9 @@ async function main() {
             for (let attempt = 1; attempt <= maxRetries && !truncated; attempt++) {
                 try {
                     await prisma.$executeRawUnsafe('TRUNCATE TABLE "_BookCategories", "Book", "Author", "Category" RESTART IDENTITY CASCADE');
-                    console.log('[bddTest] Tables truncated (RESTART IDENTITY CASCADE)');
                     truncated = true;
                 } catch (e) {
-                    console.warn(`[bddTest] TRUNCATE attempt ${attempt} failed: ${e.message}`);
+                    
                     if (attempt < maxRetries) {
                         // Delay before retry
                         await new Promise((r) => setTimeout(r, 200));
@@ -40,9 +37,8 @@ async function main() {
         const bCountAfterTruncate = await prisma.book.count();
         const aCountAfterTruncate = await prisma.author.count();
         const cCountAfterTruncate = await prisma.category.count();
-        console.log(`[bddTest] Counts after clear - books: ${bCountAfterTruncate}, authors: ${aCountAfterTruncate}, categories: ${cCountAfterTruncate}`);
+        
     } catch (err) {
-        console.error('[bddTest] Error clearing tables:', err.message);
     }
 
 
@@ -88,7 +84,6 @@ async function main() {
             await tx.book.update({ where: { id: book4.id }, data: { categories: { connect: [{ id: catClassic.id }] } } });
         });
     } catch (err) {
-        console.error('[bddTest] Error while seeding (transaction rolled back):', err.message);
         // Re-throw so tests fail intentionally
         throw err;
     }
@@ -99,7 +94,7 @@ async function main() {
     const bCountAfterSeed = await prisma.book.count();
     const aCountAfterSeed = await prisma.author.count();
     const cCountAfterSeed = await prisma.category.count();
-    console.log(`[bddTest] Counts after seed - books: ${bCountAfterSeed}, authors: ${aCountAfterSeed}, categories: ${cCountAfterSeed}`);
+    
 
     const expectedBooks = 4;
     const expectedAuthors = 3;
@@ -114,20 +109,19 @@ async function main() {
 const __filename = fileURLToPath(import.meta.url);
 if (process.argv[1] === __filename) {
     main()
-        .then(async () => {
+            .then(async () => {
             try {
                 await prisma.$disconnect();
             } catch (e) {
-                console.error('[bddTest] Error disconnecting prisma:', e.message);
             }
-            console.log('[bddTest] CLI seed finished');
+        
         })
         .catch(async (err) => {
-            console.error('[bddTest] Seed failed via CLI:', err.message);
+            
             try {
                 await prisma.$disconnect();
             } catch (e) {
-                console.error('[bddTest] Error disconnecting prisma after failure:', e.message);
+                
             }
             process.exit(1);
         });

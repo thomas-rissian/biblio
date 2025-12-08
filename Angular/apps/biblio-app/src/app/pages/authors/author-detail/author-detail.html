@@ -1,8 +1,8 @@
 <div class="bg-white rounded p-4 shadow">
-  <app-loader></app-loader>
-  <div *ngIf="author; else loadingTpl" class="flex gap-6 items-start">
+  <app-loader *ngIf="loading"></app-loader>
+  <div *ngIf="author" class="flex gap-6 items-start">
     <div class="w-32">
-      <lib-author-card [name]="author?.name" [birthDate]="author?.birthDate" [deathDate]="author?.deathDate" [id]="author?.id"></lib-author-card>
+    <lib-author-card [name]="author.name" [birthDate]="author.birthDate" [deathDate]="author.deathDate" [id]="author.id"></lib-author-card>
     </div>
     <div class="flex-1">
     <div class="flex justify-between items-start">
@@ -21,14 +21,16 @@
         <div class="text-sm font-medium">Livres de cet auteur</div>
         <div class="text-sm text-gray-500">{{ books.length }} livre(s)</div>
       </div>
-      <ul class="mt-1 list-disc ml-5 text-sm text-gray-700">
+      <div *ngIf="booksLoading" class="mt-2 text-xs text-gray-400">Chargement des livres…</div>
+      <ul *ngIf="!booksLoading && books.length > 0" class="mt-1 list-disc ml-5 text-sm text-gray-700">
         <li *ngFor="let b of books"><a class="text-blue-600 hover:underline" [routerLink]="['/books', b.id]">{{ b.title }}</a></li>
       </ul>
+      <div *ngIf="!booksLoading && books && books.length === 0" class="mt-2 text-sm text-gray-500">Aucun livre trouvé pour cet auteur.</div>
     </div>
   </div>
-  <ng-template #loadingTpl>
+  <div *ngIf="!author">
     <div *ngIf="error" class="text-sm text-red-600">{{ error }}</div>
     <div *ngIf="!error" class="text-sm text-gray-500">Chargement...</div>
-  </ng-template>
+  </div>
   <div *ngIf="error" class="text-red-600 mt-2 text-sm">{{ error }}</div>
 </div>
