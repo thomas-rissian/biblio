@@ -6,9 +6,9 @@
     "analytics": false
   },
   "newProjectRoot": "projects",
-  "defaultProject": "Front",
+  "defaultProject": "angular",
   "projects": {
-    "Front": {
+    "angular": {
       "projectType": "application",
       "schematics": {},
       "root": "apps/biblio-app",
@@ -56,14 +56,14 @@
           },
           "defaultConfiguration": "production"
         },
-        "serve": {
+            "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "Front:build:production"
+              "buildTarget": "angular:build:production"
             },
             "development": {
-              "buildTarget": "Front:build:development"
+              "buildTarget": "angular:build:development"
             }
           },
           "defaultConfiguration": "development"

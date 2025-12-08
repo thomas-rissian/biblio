@@ -1,7 +1,6 @@
-const { PrismaClient, Prisma } = require('@prisma/client');
-const prisma = new PrismaClient();
-const AppError = require('../model/AppError');
-const Book = require('../model/Book');
+import { prisma, Prisma } from '../../lib/prisma.js'
+import AppError from '../model/AppError.js';
+import Book from '../model/Book.js';
 
 function formatDate(date) {
     return date ? new Date(date).toISOString().split('T')[0] : null;
@@ -104,7 +103,7 @@ class BookDAO {
                 }
             });
         } catch (error) {
-            this.handlePrismaError(error, 'Erreur lors de la création du livre');
+            throw this.handlePrismaError(error, 'Erreur lors de la création du livre');
         }
     }
 
@@ -142,7 +141,7 @@ class BookDAO {
             });
 
         } catch (error) {
-            this.handlePrismaError(error, "Erreur lors de la mise à jour du livre");
+            throw this.handlePrismaError(error, "Erreur lors de la mise à jour du livre");
         }
     }
 
@@ -168,7 +167,7 @@ class BookDAO {
             });
 
         } catch (error) {
-            this.handlePrismaError(error, "Erreur lors de la suppression du livre");
+            throw this.handlePrismaError(error, "Erreur lors de la suppression du livre");
         }
     }
 
@@ -184,11 +183,18 @@ class BookDAO {
             if (isNaN(id)) {
                 throw new AppError('ID de l\'auteur invalide.', 400);
             }
+
+            // Check if author exists
+            const author = await prisma.author.findUnique({ where: { id } });
+            if (!author) {
+                throw new AppError("Aucun auteur trouvé avec cet ID.", 404);
+            }
+
             return await prisma.book.deleteMany({
                 where: { authorId: id },
             });
         } catch (error) {
-            this.handlePrismaError(error, "Erreur lors de la suppression des livres de l'auteur");
+            throw this.handlePrismaError(error, "Erreur lors de la suppression des livres de l'auteur");
         }
     }
 
@@ -205,6 +211,12 @@ class BookDAO {
                 throw new AppError('ID de la catégorie invalide.', 400);
             }
 
+            // Check if category exists
+            const category = await prisma.category.findUnique({ where: { id } });
+            if (!category) {
+                throw new AppError("Aucune catégorie trouvée avec cet ID.", 404);
+            }
+
             return await prisma.book.deleteMany({
                 where: {
                     categories: {
@@ -215,7 +227,7 @@ class BookDAO {
                 },
             });
         } catch (error) {
-            this.handlePrismaError(error, "Erreur lors de la suppression des livres de la catégorie");
+            throw this.handlePrismaError(error, "Erreur lors de la suppression des livres de la catégorie");
         }
     }
 
@@ -276,6 +288,11 @@ class BookDAO {
      * @throws {AppError} - Une erreur personnalisée basée sur le contexte métier.
      */
     handlePrismaError(error, defaultMessage) {
+        // If it's already an AppError, rethrow it
+        if (error instanceof AppError) {
+            throw error;
+        }
+        
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             switch (error.code) {
                 case 'P2002':
@@ -292,4 +309,4 @@ class BookDAO {
     }
 }
 
-module.exports = new BookDAO();
+export default new BookDAO();

@@ -1,55 +1,24 @@
-const categoryController = require('../controller/categoryController');
+import express from 'express';
+import * as categoryController from '../controller/categoryController.js';
 
-const routes = [
-    {
-        // Liste toutes les catégories
-        pattern: /^\/categories$/,
-        method: 'GET',
-        handler: (req, res) => {
-            categoryController.getAllCategories(req, res);
-        }
-    },
-    {
-        // Crée une nouvelle catégorie
-        pattern: /^\/categories$/,
-        method: 'POST',
-        handler: (req, res) => {
-            categoryController.createCategory(req, res);
-        }
-    },
-    {
-        // Met à jour une catégorie spécifique par ID
-        pattern: /^\/categories\/(\d+)$/,
-        method: 'PUT',
-        handler: (req, res) => {
-            categoryController.updateCategory(req, res);
-        }
-    },
-    {
-        // Récupère le nombre de livre par catégories
-        pattern: /^\/categories\/books\/count$/,
-        method: 'GET',
-        handler: (req, res) => {
-            categoryController.countBooksCategories(req, res);
-        }
-    },
-    {
-        // Affiche une catégorie spécifique par ID
-        pattern: /^\/categories\/(\d+)$/,
-        method: 'GET',
-        handler: (req, res) => {
-            categoryController.getOneCategory(req, res);
-        }
-    },
-    {
-        // Supprime une catégorie spécifique par ID et ses livres associés
-        pattern: /^\/categories\/(\d+)$/,
-        method: 'DELETE',
-        handler: (req, res) => {
-            categoryController.deleteCategory(req, res);
-        }
-    },
+const router = express.Router();
 
-];
+// GET all categories
+router.get('/', categoryController.getAllCategories);
 
-module.exports = routes;
+// GET book count by categories (must come before /:id)
+router.get('/books/count', categoryController.countBooksCategories);
+
+// POST create new category
+router.post('/', categoryController.createCategory);
+
+// GET category by ID
+router.get('/:id', categoryController.getOneCategory);
+
+// PUT update category
+router.put('/:id', categoryController.updateCategory);
+
+// DELETE category
+router.delete('/:id', categoryController.deleteCategory);
+
+export default router;

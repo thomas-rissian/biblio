@@ -1,13 +1,13 @@
-const CategoryTest = require('../../src/model/Category');
+import Category from '../../src/model/Category.js';
 
-describe('Modèle CategoryTest', () => {
+describe('Modèle Category', () => {
 
     it('doit créer une instance valide de Category avec les bonnes données', () => {
         const data = {
             id: 1,
             name: 'Fantasy'
         };
-        const category = new CategoryTest(data);
+        const category = new Category(data);
 
         expect(category.id).toBe(1);
         expect(category.name).toBe('Fantasy');
@@ -18,7 +18,7 @@ describe('Modèle CategoryTest', () => {
             id: 1,
             name: 'Fantasy'
         };
-        const category = new CategoryTest(data);
+        const category = new Category(data);
 
         const errors = category.validate();
         expect(errors).toEqual([]); // Aucune erreur, validation réussie
@@ -29,7 +29,7 @@ describe('Modèle CategoryTest', () => {
             id: null,
             name: 'Fantasy'
         };
-        const category = new CategoryTest(data);
+        const category = new Category(data);
 
         const errors = category.validate();
         expect(errors).toContain("L'ID de la catégorie est invalide.");
@@ -40,7 +40,7 @@ describe('Modèle CategoryTest', () => {
             id: 1,
             name: ''
         };
-        const category = new CategoryTest(data);
+        const category = new Category(data);
 
         const errors = category.validate();
         expect(errors).toContain("Le nom de la catégorie est obligatoire.");
@@ -51,7 +51,7 @@ describe('Modèle CategoryTest', () => {
             id: 1,
             name: null
         };
-        const category = new CategoryTest(data);
+        const category = new Category(data);
 
         const errors = category.validate();
         expect(errors).toContain("Le nom de la catégorie est obligatoire.");
@@ -62,7 +62,7 @@ describe('Modèle CategoryTest', () => {
             id: 1,
             name: 'Science Fiction'
         };
-        const category = new CategoryTest(data);
+        const category = new Category(data);
 
         const errors = category.validate();
         expect(errors).toEqual([]); // Validation réussie
@@ -73,7 +73,7 @@ describe('Modèle CategoryTest', () => {
             id: null,
             name: 'Fantasy'
         };
-        const category = new CategoryTest(data);
+        const category = new Category(data);
 
         const errors = category.validate(true); // isUpdate = true
         expect(errors).toContain("L'ID de la catégorie est invalide.");
@@ -84,7 +84,7 @@ describe('Modèle CategoryTest', () => {
             id: 1,
             name: 'Fantasy'
         };
-        const category = new CategoryTest(data);
+        const category = new Category(data);
 
         const errors = category.validate(true); // isUpdate = true
         expect(errors).toEqual([]); // Validation réussie

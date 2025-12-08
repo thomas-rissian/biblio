@@ -1,5 +1,5 @@
-const authorDAO = require('../dao/authorDAO'); // Assurez-vous que `authorDAO` est correctement défini et exporté
-const Author = require('../model/Author');
+import authorDAO from '../dao/authorDAO.js';
+import Author from '../model/Author.js';
 
 const handleRequest = async (req, res, callback) => {
     try {
@@ -7,64 +7,46 @@ const handleRequest = async (req, res, callback) => {
     } catch (error) {
         console.error('Erreur dans le contrôleur :', error);
         const statusCode = error.statusCode || 500;
-        res.writeHead(statusCode, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: error.message || 'Erreur interne du serveur' }));
+        res.status(statusCode).json({ message: error.message || 'Erreur interne du serveur' });
     }
 };
 
 const getAllAuthors = async (req, res) => handleRequest(req, res, async() => {
         const authors = await authorDAO.getAll();
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(authors));
+        res.status(200).json(authors);
 });
 
 const createAuthor = async (req, res) => handleRequest(req, res, async () => {
-        const body = await readRequestBody(req);
-        const data = JSON.parse(body);
+        const data = req.body;
         const newAuthor = await authorDAO.create(new Author(data));
-        res.writeHead(201, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(newAuthor));
+        res.status(201).json(newAuthor);
 });
 
 const getOneAuthor = async (req, res) =>  handleRequest(req, res, async () => {
-    const id = parseInt(req.url.split('/')[2]);
-    const author = await authorDAO.getById(id);
+    const { id } = req.params;
+    const author = await authorDAO.getById(parseInt(id));
     if (author) {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(author));
+        res.status(200).json(author);
     } else {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Auteur non trouvé.' }));
+        res.status(404).json({ message: 'Auteur non trouvé.' });
     }
 });
 
 const updateAuthor = async (req, res) =>  handleRequest(req, res, async () => {
-
-    const body = await readRequestBody(req);
-    const data = JSON.parse(body);
-    data.id = parseInt(req.url.split('/')[2]);
+    const { id } = req.params;
+    const data = req.body;
+    data.id = parseInt(id);
     const updatedAuthor = await authorDAO.update(new Author(data));
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(updatedAuthor));
+    res.status(200).json(updatedAuthor);
 });
 
 const deleteAuthor = async (req, res) =>  handleRequest(req, res, async () => {
-    const id = parseInt(req.url.split('/')[2]);
-    await authorDAO.delete(id);
-    res.writeHead(204);
-    res.end();
+    const { id } = req.params;
+    await authorDAO.delete(parseInt(id));
+    res.status(204).end();
 });
 
-const readRequestBody = (req) => new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', chunk => {
-        body += chunk.toString();
-    });
-    req.on('end', () => resolve(body));
-    req.on('error', (err) => reject(err));
-});
-
-module.exports = {
+export {
     getAllAuthors,
     createAuthor,
     getOneAuthor,

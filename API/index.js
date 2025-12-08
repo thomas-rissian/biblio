@@ -1,25 +1,45 @@
-const http = require('http');
-const PORT = 40000;
-const router = require('./src/route/router');
+import express from 'express';
+import bookRouter from './src/route/bookRouter.js';
+import authorRouter from './src/route/authorRouter.js';
+import categoryRouter from './src/route/categoryRouter.js';
+import { prisma } from './lib/prisma.js';
 
-const server = http.createServer((req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');  // Autorise toutes les origines
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');  // Méthodes autorisées
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');  // En-têtes autorisés
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-    if (req.method === 'OPTIONS') {
-        res.writeHead(204);
-        res.end();
-        return;
-    }
+// Middleware
+app.use(express.json());
 
-    router(req, res);
+// CORS headers
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
 });
 
-server.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
+// Mount routers
+app.use('/books', bookRouter);
+app.use('/authors', authorRouter);
+app.use('/categories', categoryRouter);
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ message: 'Internal Server Error' });
 });
 
-module.exports = {
-    PORT,
-}
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+process.on('SIGINT', async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});

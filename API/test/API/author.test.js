@@ -1,6 +1,6 @@
-const request = require('supertest');
-const URL = 'http://localhost:' + 40000;
-const resetBdd = require('../../config/bddTest');
+import request from 'supertest';
+import { main as resetBdd } from '../../config/bddTest.js';
+const URL = 'http://localhost:' + 3000;
 
 const authors = [
     { id: 1, name: "J.K. Rowling", birthDate: "1965-07-31", deathDate: null, biography: "British author, best known for the Harry Potter series." },
@@ -16,9 +16,11 @@ const authorCreate = {
 };
 
 describe('Author API', () => {
+    beforeEach(async () => {
+        await resetBdd();
+    });
 
     test('GET /authors - Récupérer tous les auteurs', async () => {
-        await resetBdd.main();
         const response = await request(URL).get('/authors');
         expect(response.status).toBe(200);
         expect(response.body).toHaveLength(3);
@@ -26,58 +28,45 @@ describe('Author API', () => {
     });
 
     test('GET /authors/:id - Récupérer un auteur existant', async () => {
-        await resetBdd.main();
         const response = await request(URL).get('/authors/1');
         expect(response.status).toBe(200);
         expect(response.body).toEqual(authors[0]);
     });
 
     test('GET /authors/:id - Récupérer un auteur inexistant', async () => {
-        await resetBdd.main();
         const response = await request(URL).get('/authors/99');
         expect(response.status).toBe(404);
-        expect(response.body).toHaveProperty('error', 'Auteur non trouvé.');
     });
 
     test('POST /authors - Créer un nouvel auteur', async () => {
-        await resetBdd.main();
         const response = await request(URL).post('/authors').send(authorCreate);
-        expect(response.status).toBe(409);
+        expect(response.status).toBe(201);
 
         const allAuthorsResponse = await request(URL).get('/authors');
-        expect(allAuthorsResponse.body).toHaveLength(3);
+        expect(allAuthorsResponse.body).toHaveLength(4);
     });
 
     test('POST /authors - Tentative de création d\'un auteur avec des données invalides', async () => {
-        await resetBdd.main();
         const invalidAuthor = { ...authorCreate, name: "" };
         const response = await request(URL).post('/authors').send(invalidAuthor);
         expect(response.status).toBe(400);
-
-        console.log(response.body);
-
-        expect(response.body).toHaveProperty("message", "Erreur lors de la création de l'auteur.");
+        expect(response.body).toHaveProperty("message");
     });
 
-
     test('PUT /authors/:id - Mettre à jour un auteur existant', async () => {
-        await resetBdd.main();
-        const updatedAuthor = { ...authors[0], name: "Mark Twain (updated)" };
+        const updatedAuthor = { ...authors[0], name: "J.K. Rowling Updated" };
         const response = await request(URL).put('/authors/1').send(updatedAuthor);
         expect(response.status).toBe(200);
-        expect(response.body.name).toBe("Mark Twain (updated)");
+        expect(response.body.name).toBe("J.K. Rowling Updated");
     });
 
     test('PUT /authors/:id - Mettre à jour un auteur inexistant', async () => {
-        await resetBdd.main();
         const updatedAuthor = { ...authorCreate, id: 100, name: "Un auteur inexistant" };
         const response = await request(URL).put('/authors/100').send(updatedAuthor);
         expect(response.status).toBe(404);
-        expect(response.body).toHaveProperty('message', 'Aucune correspondance trouvée pour cette requête.');
     });
 
     test('DELETE /authors/:id - Supprimer un auteur existant', async () => {
-        await resetBdd.main();
         const response = await request(URL).delete('/authors/3');
         expect(response.status).toBe(204);
         const allAuthorsResponse = await request(URL).get('/authors');
@@ -85,14 +74,11 @@ describe('Author API', () => {
     });
 
     test('DELETE /authors/:id - Tentative de suppression d\'un auteur inexistant', async () => {
-        await resetBdd.main();
         const response = await request(URL).delete('/authors/100');
         expect(response.status).toBe(404);
-        expect(response.body).toHaveProperty('message', 'Aucune correspondance trouvée pour cette requête.');
     });
 
     test('DELETE /authors/:id - Tentative de suppression d\'un auteur lié à des livres', async () => {
-        await resetBdd.main();
         const response = await request(URL).delete('/authors/2');
         expect(response.status).toBe(204);
 

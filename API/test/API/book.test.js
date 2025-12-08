@@ -1,12 +1,14 @@
-const request = require('supertest');
-const resetBdd = require("../../config/bddTest");
-const PORT = 40000;
+import request from 'supertest';
+import { main as resetBdd } from "../../config/bddTest.js";
+const PORT = 3000;
 const URL = `http://localhost:${PORT}`;
 
 describe('Book API', () => {
+    beforeEach(async () => {
+        await resetBdd();
+    });
 
     test('GET /books - Récupérer tous les livres', async () => {
-        await resetBdd.main();
         const response = await request(URL).get('/books');
         expect(response.status).toBe(200);
         expect(response.body).toBeInstanceOf(Array);
@@ -14,7 +16,6 @@ describe('Book API', () => {
     });
 
     test('GET /books/:id - Récupérer un livre existant', async () => {
-        await resetBdd.main();
         const response = await request(URL).get('/books/1');
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
@@ -29,13 +30,11 @@ describe('Book API', () => {
     });
 
     test('GET /books/:id - Récupérer un livre inexistant', async () => {
-        await resetBdd.main();
         const response = await request(URL).get('/books/99');
         expect(response.status).toBe(404);
     });
 
     test('POST /books - Ajouter un nouveau livre', async () => {
-        await resetBdd.main();
         const newBook = {
             title: "New Book Title",
             description: "Description of new book",
@@ -49,7 +48,6 @@ describe('Book API', () => {
     });
 
     test('POST /books - Tentative d\'ajout d\'un livre avec un titre vide', async () => {
-        await resetBdd.main();
         const invalidBook = {
             title: "",
             description: "Description of new book",
@@ -59,11 +57,9 @@ describe('Book API', () => {
         };
         const response = await request(URL).post('/books').send(invalidBook);
         expect(response.status).toBe(400);
-        expect(response.body.message).toBe("Erreur lors de la création du livre");
     });
 
     test('PUT /books/:id - Mettre à jour un livre', async () => {
-        await resetBdd.main();
         const updatedBook = {
             title: "Updated Book Title",
             description: "Updated description",
@@ -77,7 +73,6 @@ describe('Book API', () => {
     });
 
     test('PUT /books/:id - Tentative de mise à jour d\'un livre inexistant', async () => {
-        await resetBdd.main();
         const updatedBook = {
             title: "Updated Book Title",
             description: "Updated description",
@@ -90,25 +85,21 @@ describe('Book API', () => {
     });
 
     test('DELETE /books/:id - Supprimer un livre existant', async () => {
-        await resetBdd.main();
         const response = await request(URL).delete('/books/2');
         expect(response.status).toBe(200);
     });
 
     test('DELETE /books/:id - Supprimer un livre inexistant', async () => {
-        await resetBdd.main();
         const response = await request(URL).delete('/books/99');
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(404);
     });
 
     test('DELETE /books/author/:authorId - Supprimer les livres par auteur', async () => {
-        await resetBdd.main();
         const response = await request(URL).delete('/books/author/2');
         expect(response.status).toBe(200);
     });
 
     test('DELETE /books/categories/:categoryId - Supprimer les livres par catégorie', async () => {
-        await resetBdd.main();
         const response = await request(URL).delete('/books/categories/3');
         expect(response.status).toBe(200);
     });

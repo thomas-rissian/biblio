@@ -49,7 +49,7 @@ class Author {
         if (!this.#biography || this.#biography.trim().length === 0) {
             errors.push({ biography: "La biographie de l'auteur est obligatoire." });
         }
-        if (this.#birthDate && isNaN(this.#birthDate.getTime()) || !this.#birthDate) {
+        if (!this.#birthDate || isNaN(this.#birthDate.getTime())) {
             errors.push({ birthDate: "La date de naissance est invalide." });
         }
 
@@ -76,4 +76,4 @@ class Author {
     }
 }
 
-module.exports = Author;
+export default Author;

@@ -42,4 +42,4 @@ class Category {
     }
 }
 
-module.exports = Category;
+export default Category;

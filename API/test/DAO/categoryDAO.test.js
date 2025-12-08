@@ -1,12 +1,15 @@
-const CategoryDAO = require('../../src/dao/CategoryDAO');
-const Categories = require('../../src/model/Category');
-const AppError = require('../../src/model/AppError');
-const resetBdd = require('../../config/bddTest');
+import categoryDAO from '../../src/dao/categoryDAO.js';
+import Category from '../../src/model/Category.js';
+import AppError from '../../src/model/AppError.js';
+import { main as resetBdd } from '../../config/bddTest.js';
 
 describe('CategoryDAO', () => {
+    beforeEach(async () => {
+        await resetBdd();
+    });
+
     test('getAll() retourne toutes les catégories', async () => {
-        await resetBdd.main();
-        const allCategories =  await CategoryDAO.getAll();
+        const allCategories =  await categoryDAO.getAll();
         expect(allCategories).toHaveLength(4);
         expect(allCategories).toEqual(
             expect.arrayContaining([
@@ -17,82 +20,79 @@ describe('CategoryDAO', () => {
             ])
         );
     });
+
     test('getById() retourne une catégorie existante', async () => {
-        await resetBdd.main();
-        const categorie = await CategoryDAO.getById(1);
-
+        const categorie = await categoryDAO.getById(1);
         expect(categorie).not.toBeNull();
-
         expect(categorie).toEqual({ id: 1, name: 'Fantasy' });
     });
 
     test('getById() retourne null pour une catégorie inexistante', async () => {
-        const category = await CategoryDAO.getById(99);
+        const category = await categoryDAO.getById(99);
         expect(category).toBeNull();
     });
 
     test('create() ajoute une nouvelle catégorie', async () => {
-        await resetBdd.main();
-        const newCategory = new Categories({ name: 'Science' });
-        const createdCategory = await CategoryDAO.create(newCategory);
-        expect(createdCategory.name).toBe('Science');
+        const newCategory = new Category({ name: 'Science Fiction' });
+        const createdCategory = await categoryDAO.create(newCategory);
+        expect(createdCategory.name).toBe('Science Fiction');
 
-        const allCategories = await CategoryDAO.getAll();
+        const allCategories = await categoryDAO.getAll();
         expect(allCategories).toHaveLength(5);
     });
 
     test('create() lève une erreur pour des données invalides', async () => {
-        const invalidCategory = new Categories({ name: '' });
+        const invalidCategory = new Category({ name: '' });
         try {
-            await CategoryDAO.create(invalidCategory);
+            await categoryDAO.create(invalidCategory);
+            fail('Devrait avoir levé une erreur');
         } catch (error) {
             expect(error).toBeInstanceOf(AppError);
-            expect(error.message).toBe('Erreur lors de la création de la catégorie.');
+            expect(error.message).toBe('Données de catégories invalides.');
         }
     });
 
     test('update() met à jour une catégorie existante', async () => {
-        await resetBdd.main();
-        const updatedCategory = new Categories({ id: 2, name: 'Science Updated' });
-        await CategoryDAO.update(updatedCategory);
-        const category = await CategoryDAO.getById(2);
+        const updatedCategory = new Category({ id: 2, name: 'Science Updated' });
+        await categoryDAO.update(updatedCategory);
+        const category = await categoryDAO.getById(2);
         expect(category).toEqual({ id: 2, name: 'Science Updated' });
     });
 
     test('update() retourne null pour une catégorie inexistante', async () => {
         try{
-            await resetBdd.main();
-            const updatedCategory = new Categories({ id: 99, name: 'Science Updated' });
-            await CategoryDAO.update(updatedCategory);
+            const updatedCategory = new Category({ id: 99, name: 'Science Updated' });
+            await categoryDAO.update(updatedCategory);
+            fail('Devrait avoir levé une erreur');
         } catch (error) {
-            console.log(error);
             expect(error).toBeInstanceOf(AppError);
+            // La 404 vient de Prisma P2025, c'est l'erreur attendue
             expect(error.message).toBe('Aucune catégorie correspondante trouvée.');
         }
     });
 
     test('delete() supprime une catégorie existante', async () => {
-        await resetBdd.main();
-        const deletedCategory = await CategoryDAO.delete(3);
-        expect(deletedCategory).toEqual( { id: 3, name: 'Romance' });
+        const deletedCategory = await categoryDAO.delete(3);
+        expect(deletedCategory).toBeTruthy();
+        expect(deletedCategory.id).toBe(3);
+        expect(deletedCategory.name).toBe('Romance');
 
-        const allCategories = await CategoryDAO.getAll();
+        const allCategories = await categoryDAO.getAll();
         expect(allCategories).toHaveLength(3);
     });
 
     test('delete() retourne null pour une catégorie inexistante', async () => {
         try{
-            await CategoryDAO.delete(50);
+            await categoryDAO.delete(50);
+            fail('Devrait avoir levé une erreur');
         } catch (error) {
             expect(error).toBeInstanceOf(AppError);
             expect(error.message).toBe('Aucune catégorie correspondante trouvée.');
         }
-
     });
 
     test('getCategoriesBookCount() retourne le nombre de livres par catégorie', async () => {
-        await resetBdd.main();
-        const counts = await CategoryDAO.getCategoriesBookCount();
+        const counts = await categoryDAO.getCategoriesBookCount();
         expect(counts).toEqual(
             expect.arrayContaining([
                 { id: 1, name: 'Fantasy', count: expect.any(Number) },

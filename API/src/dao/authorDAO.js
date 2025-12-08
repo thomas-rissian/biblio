@@ -1,8 +1,7 @@
-const { PrismaClient, Prisma } = require('@prisma/client');
-const prisma = new PrismaClient();
-const AppError = require('../model/AppError');
-const Author = require('../model/Author');
-const BookDAO = require('../dao/bookDAO');
+import { prisma, Prisma } from '../../lib/prisma.js'
+import AppError from '../model/AppError.js';
+import Author from '../model/Author.js';
+import bookDAO from '../dao/bookDAO.js';
 
 function formatDate(date) {
     return date ? new Date(date).toISOString().split('T')[0] : null;
@@ -27,7 +26,7 @@ class AuthorDAO {
                 data: authorData,
             });
         } catch (error) {
-            this.handlePrismaError(error, 'Erreur lors de la création de l\'auteur.');
+            throw this.handlePrismaError(error, 'Erreur lors de la création de l\'auteur.');
         }
     }
 
@@ -93,13 +92,13 @@ class AuthorDAO {
             if (isNaN(id)) {
                 throw new AppError("ID d'auteur invalide.", 400);
             }
-            const data = author.toJson();
+            const data = author.toJson(false);
             return await prisma.author.update({
                 where: { id },
                 data,
             });
         } catch (error) {
-            this.handlePrismaError(error, 'Erreur lors de la mise à jour de l\'auteur.');
+            throw this.handlePrismaError(error, 'Erreur lors de la mise à jour de l\'auteur.');
         }
     }
 
@@ -115,12 +114,19 @@ class AuthorDAO {
             if (isNaN(id)) {
                 throw new AppError("ID d'auteur invalide.", 400);
             }
-            await BookDAO.deleteByAuthor(id);
+            
+            // Check if author exists
+            const author = await prisma.author.findUnique({ where: { id } });
+            if (!author) {
+                throw new AppError("Aucune correspondance trouvée pour cette requête.", 404);
+            }
+            
+            await bookDAO.deleteByAuthor(id);
             return await prisma.author.delete({
                 where: { id },
             });
         } catch (error) {
-            this.handlePrismaError(error, 'Erreur lors de la suppression de l\'auteur.');
+            throw this.handlePrismaError(error, 'Erreur lors de la suppression de l\'auteur.');
         }
     }
     /**
@@ -130,6 +136,11 @@ class AuthorDAO {
      * @throws {AppError} - Une erreur personnalisée basée sur le contexte métier.
      */
     handlePrismaError(error, defaultMessage) {
+        // If it's already an AppError, rethrow it
+        if (error instanceof AppError) {
+            throw error;
+        }
+        
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             switch (error.code) {
                 case 'P2002':
@@ -146,4 +157,4 @@ class AuthorDAO {
     }
 }
 
-module.exports = new AuthorDAO();
+export default new AuthorDAO();

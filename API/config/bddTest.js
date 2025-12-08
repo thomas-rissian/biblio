@@ -1,6 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-const fs = require('fs');
+import { prisma } from '../lib/prisma.js'
+import fs from 'fs';
 
 
 async function main() {
@@ -8,9 +7,9 @@ async function main() {
     await prisma.$connect();
 
     // Supprimer les données existantes pour éviter les conflits
-    await prisma.book.deleteMany();
-    await prisma.author.deleteMany();
-    await prisma.category.deleteMany();
+    await prisma.book.deleteMany({});
+    await prisma.author.deleteMany({});
+    await prisma.category.deleteMany({});
 
 
     // Création des catégories avec des IDs fixes
@@ -21,6 +20,7 @@ async function main() {
             { id: 3, name: 'Romance' },
             { id: 4, name: 'Classic Literature' },
         ],
+        skipDuplicates: true,
     });
 
     // Création des auteurs avec des IDs fixes
@@ -30,6 +30,7 @@ async function main() {
             { id: 2, name: 'George Orwell', birthDate: new Date('1903-06-25'), deathDate: new Date('1950-01-21'), biography: 'English novelist and essayist, known for "1984" and "Animal Farm".' },
             { id: 3, name: 'Jane Austen', birthDate: new Date('1775-12-16'), deathDate: new Date('1817-07-18'), biography: 'English novelist known for "Pride and Prejudice".' },
         ],
+        skipDuplicates: true,
     });
 
     // Création des livres avec des IDs fixes
@@ -64,6 +65,7 @@ async function main() {
                 authorId: 2,
             },
         ],
+        skipDuplicates: true,
     });
 
     // Ajout des relations entre livres et catégories après création
@@ -100,14 +102,4 @@ async function main() {
     console.log('Database has been seeded successfully!');
 };
 
-main()
-    .catch(e => {
-        throw e;
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
-
-module.exports = {
-    main,
-};
+export { main };

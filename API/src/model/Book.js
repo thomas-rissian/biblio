@@ -7,7 +7,7 @@ class Book {
     #author = null;
     #publicationDate = null;
     #description = null;
-    #categories = []; // Nouveau champ pour les catégories
+    #categories = []; 
     #error = [];
     /**
      * @param {{ id?: number, title: string, authorId: number, publicationDate?: Date, description?: string, categoryIds?: number[] }} data
@@ -103,4 +103,4 @@ class Book {
     }
 }
 
-module.exports = Book;
+export default Book;

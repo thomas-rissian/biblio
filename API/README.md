@@ -1,95 +1,69 @@
-# Biblio API
+# Projet API Prisma
 
-L'API **Biblio** permet d'effectuer des opérations CRUD sur la base de données.  
-Elle n'utilise aucun framework (bien qu'Express, par exemple, aurait simplifié le développement), conformément aux exigences du cahier des charges (CDC).  
-L'ORM **Prisma** est utilisé pour gérer la base de données, offrant flexibilité et facilité d'évolution.
+Un projet API utilisant Prisma ORM avec PostgreSQL.
 
-L'API est hébergée sur un serveur distinct pour garantir une indépendance complète vis-à-vis du serveur web qui l'exploitera. Cette architecture améliore également la sécurité, en isolant la base de données du frontend.
+## Installation
 
----
+```bash
+npm install
+```
 
-## Configuration du projet
+## Configuration
 
-1. Installation des dépendances :
-   ```sh
-   npm install
-   ```
+1. Créez un fichier `.env` basé sur `.env.example`:
+```bash
+cp .env.example .env
+```
 
+2. Mettez à jour les variables d'environnement avec vos identifiants PostgreSQL.
 
-## Base de données
+## Migrations
 
-1. Créez un fichier `.env` à la racine du projet avec le contenu suivant :
-   ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/mydb?schema=public"
-   ```
+Créer une migration:
+```bash
+npx prisma migrate dev --name nom_de_la_migration
+```
 
-2. Par défaut, Prisma est configuré pour utiliser **PostgreSQL**. Si vous souhaitez utiliser un autre SGBD, modifiez le fichier `prisma/schema.prisma` :
-   ```prisma
-   provider = "postgresql"
-   ```
+Appliquer les migrations:
+```bash
+npx prisma migrate deploy
+```
 
-3. Appliquez les migrations de la base de données :
-   ```sh
-   npx prisma migrate dev --name init
-   ```
+## Utilisation
 
-4. Générez les fichiers Prisma nécessaires :
-   ```sh
-   npx prisma generate
-   ```
+Générer Prisma Client:
+```bash
+npx prisma generate
+```
 
-5. (Facultatif) Ajoutez des données de test à la base de données :
-   ```sh
-   npm run bdd
-   ```
+Lancer un script de test:
+```bash
+node script.js
+```
 
----
+## Studio Prisma
 
-Démarrage du serveur :
-   ```sh
-   npm start
-   ```
+Visualiser et modifier vos données:
+```bash
+npx prisma studio --config ./prisma.config.js
+```
 
-   L'API sera accessible par défaut à l'adresse suivante :  
-   [http://localhost:40000](http://localhost:40000)
+## Structure du projet
 
-## Routes disponibles
+```
+├── lib/
+│   └── prisma.js          # Instance Prisma Client
+├── prisma/
+│   ├── schema.prisma      # Modèles de données
+│   └── migrations/        # Historique des migrations
+├── .env.example           # Template des variables d'environnement
+├── .gitignore
+├── package.json
+├── prisma.config.js       # Configuration Prisma
+└── script.js              # Script de test
+```
 
-### Livres
-- `GET`    : `/books` - Récupère tous les livres
-- `POST`   : `/books` - Crée un livre
-- `GET`    : `/books/:id` - Récupère un livre spécifique
-- `PUT`    : `/books/:id` - Modifie un livre
-- `DELETE` : `/books/:id` - Supprime un livre
-- `GET`    : `/books/author/:id` - Récupère les livres d'un auteur
-- `DELETE` : `/books/author/:id` - Supprime les livres d'un auteur
-- `GET`    : `/books/categories/:id` - Récupère les livres d'une catégorie
-- `DELETE` : `/books/categories/:id` - Supprime les livres d'une catégorie
+## Documentation
 
-### Catégories
-- `GET`    : `/categories` - Récupère toutes les catégories
-- `GET`    : `/categories/:id` - Récupère une catégorie spécifique
-- `POST`   : `/categories` - Crée une catégorie
-- `PUT`    : `/categories/:id` - Modifie une catégorie
-- `DELETE` : `/categories/:id` - Supprime une catégorie et ses livres si nécessaire
-
-### Auteurs
-- `GET`    : `/authors` - Récupère tous les auteurs
-- `GET`    : `/authors/:id` - Récupère un auteur spécifique
-- `POST`   : `/authors` - Crée un auteur
-- `PUT`    : `/authors/:id` - Modifie un auteur
-- `DELETE` : `/authors/:id` - Supprime un auteur et ses livres associés
-
----
-
-## Remarques supplémentaires
-
-- Respectez le format des données attendu par l'API lors des requêtes `POST` et `PUT`.
-- Toute erreur ou exception renvoyée par l'API suit un format JSON standardisé, avec un message explicatif.
-- Pour des performances optimales, Prisma est configuré pour utiliser des transactions sécurisées.
-
----
-
-### Exemple de fichier `.env`
-```env
-DATABASE_URL="postgresql://username:password@localhost:5432/mydatabase?schema=public"
+- [Prisma ORM](https://www.prisma.io/docs/orm)
+- [Prisma Postgres](https://www.prisma.io/docs/postgres)

@@ -1,8 +1,7 @@
-const { PrismaClient, Prisma } = require('@prisma/client');
-const prisma = new PrismaClient();
-const AppError = require('../model/AppError');
-const Categories = require("../model/Category");
-const BookDAO = require("./bookDAO");
+import { prisma, Prisma } from '../../lib/prisma.js'
+import AppError from '../model/AppError.js';
+import Category from "../model/Category.js";
+import bookDAO from "./bookDAO.js";
 
 class CategoryDAO {
     async getAll() {
@@ -26,19 +25,20 @@ class CategoryDAO {
 
     async create(categories) {
         try {
-            if (!(categories instanceof Categories) || categories.validate(false).length > 0) {
+            if (!(categories instanceof Category) || categories.validate(false).length > 0) {
                 throw new AppError("Données de catégories invalides.", 400);
             }
             const data = categories.toJson();
             return await prisma.category.create({ data });
         } catch (error) {
-            this.handlePrismaError(error, "Erreur lors de la création de la catégorie.");
+            console.error('Create error:', error.message, error.code);
+            throw this.handlePrismaError(error, "Erreur lors de la création de la catégorie.");
         }
     }
 
     async update(categories) {
         try {
-            if (!(categories instanceof Categories) || categories.validate(false).length > 0) {
+            if (!(categories instanceof Category) || categories.validate(false).length > 0) {
                 throw new AppError("Données de catégories invalides.", 400);
             }
 
@@ -53,7 +53,8 @@ class CategoryDAO {
                 data,
             });
         } catch (error) {
-            this.handlePrismaError(error, "Erreur lors de la mise à jour de la catégorie.");
+            console.error('Update error:', error.message, error.code);
+            throw this.handlePrismaError(error, "Erreur lors de la mise à jour de la catégorie.");
         }
     }
 
@@ -63,10 +64,18 @@ class CategoryDAO {
             if (isNaN(id)) {
                 throw new AppError("ID de catégorie invalide.", 400);
             }
-            await BookDAO.deleteByCategory(id);
+            
+            // Check if category exists
+            const category = await prisma.category.findUnique({ where: { id } });
+            if (!category) {
+                throw new AppError("Aucune catégorie correspondante trouvée.", 404);
+            }
+            
+            await bookDAO.deleteByCategory(id);
             return await prisma.category.delete({ where: { id } });
         } catch (error) {
-            this.handlePrismaError(error, "Erreur lors de la suppression de la catégorie.");
+            console.error('Delete error:', error.message, error.code);
+            throw this.handlePrismaError(error, "Erreur lors de la suppression de la catégorie.");
         }
     }
 
@@ -97,6 +106,11 @@ class CategoryDAO {
      * @throws {AppError}
      */
     handlePrismaError(error, defaultMessage) {
+        // If it's already an AppError, rethrow it
+        if (error instanceof AppError) {
+            throw error;
+        }
+        
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             switch (error.code) {
                 case 'P2002':
@@ -113,4 +127,4 @@ class CategoryDAO {
     }
 }
 
-module.exports = new CategoryDAO();
+export default new CategoryDAO();

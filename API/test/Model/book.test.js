@@ -1,6 +1,6 @@
-const BookTest = require('../../src/model/Book');
+import Book from '../../src/model/Book.js';
 
-describe('Modèle BookTest', () => {
+describe('Modèle Book', () => {
 
     // Test pour une instance valide de Book
     it('doit créer une instance valide de Book avec les bonnes données', () => {
@@ -12,7 +12,7 @@ describe('Modèle BookTest', () => {
             description: 'A young wizard embarks on his journey.',
             categoryIds: [1, 2]
         };
-        const book = new BookTest(data);
+        const book = new Book(data);
 
         expect(book.id).toBe(1);
         expect(book.title).toBe('Harry Potter and the Philosopher\'s Stone');
@@ -32,7 +32,7 @@ describe('Modèle BookTest', () => {
             description: 'A young wizard embarks on his journey.',
             categoryIds: [1, 2]
         };
-        const book = new BookTest(data);
+        const book = new Book(data);
 
         const errors = book.validate();
         expect(errors).toEqual([]); // Aucune erreur, validation réussie
@@ -47,7 +47,7 @@ describe('Modèle BookTest', () => {
             description: 'A young wizard embarks on his journey.',
             categoryIds: [1, 2]
         };
-        const book = new BookTest(data);
+        const book = new Book(data);
 
         const errors = book.validate();
         expect(errors).toContainEqual({ id: "L'ID du livre est invalide." });
@@ -62,7 +62,7 @@ describe('Modèle BookTest', () => {
             description: 'A young wizard embarks on his journey.',
             categoryIds: [1, 2]
         };
-        const book = new BookTest(data);
+        const book = new Book(data);
 
         const errors = book.validate();
         expect(errors).toContainEqual({ title: "Le titre du livre est obligatoire." });
@@ -77,7 +77,7 @@ describe('Modèle BookTest', () => {
             description: 'A young wizard embarks on his journey.',
             categoryIds: [1, 2]
         };
-        const book = new BookTest(data);
+        const book = new Book(data);
 
         const errors = book.validate();
         expect(errors).toContainEqual({ author: "L'auteur du livre est obligatoire et doit être un identifiant valide." });
@@ -92,7 +92,7 @@ describe('Modèle BookTest', () => {
             description: 'A young wizard embarks on his journey.',
             categoryIds: [1, 2]
         };
-        const book = new BookTest(data);
+        const book = new Book(data);
 
         const errors = book.validate();
         expect(errors).toContainEqual({ publicationDate: "La date de publication est obligatoire et doit être une date valide." });
@@ -107,7 +107,7 @@ describe('Modèle BookTest', () => {
             description: '',
             categoryIds: [1, 2]
         };
-        const book = new BookTest(data);
+        const book = new Book(data);
 
         const errors = book.validate();
         expect(errors).toContainEqual({ description: "La description du livre est obligatoire." });
@@ -122,7 +122,7 @@ describe('Modèle BookTest', () => {
             description: 'A young wizard embarks on his journey.',
             categoryIds: []
         };
-        const book = new BookTest(data);
+        const book = new Book(data);
 
         const errors = book.validate();
         expect(errors).toContainEqual({ categories: "Les catégories sont obligatoires et doivent contenir au moins une catégorie." });
@@ -137,7 +137,7 @@ describe('Modèle BookTest', () => {
             description: 'A young wizard embarks on his journey.',
             categoryIds: [1, 'invalid'] // "invalid" est un identifiant non valide
         };
-        const book = new BookTest(data);
+        const book = new Book(data);
 
         const errors = book.validate();
         expect(errors).toContainEqual({ categories: "Tous les identifiants des catégories doivent être valides." });
@@ -152,7 +152,7 @@ describe('Modèle BookTest', () => {
             description: 'A young wizard embarks on his journey.',
             categoryIds: [1, 2]
         };
-        const book = new BookTest(data);
+        const book = new Book(data);
 
         const errors = book.validate();
         expect(errors).toEqual([]); // Validation réussie, aucune erreur

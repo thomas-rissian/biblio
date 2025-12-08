@@ -1,6 +1,6 @@
-const AuthorTest = require('../../src/model/Author');
+import Author from '../../src/model/Author.js';
 
-describe('Modèle AuthorTest', () => {
+describe('Modèle Author', () => {
     it('doit créer une instance valide d\'AuthorTest avec les bonnes données', () => {
         const data = {
             id: 1,
@@ -9,7 +9,7 @@ describe('Modèle AuthorTest', () => {
             deathDate: null,
             biography: 'British author, best known for the Harry Potter series.'
         };
-        const author = new AuthorTest(data);
+        const author = new Author(data);
 
         expect(author.id).toBe(1);
         expect(author.name).toBe('J.K. Rowling');
@@ -26,7 +26,7 @@ describe('Modèle AuthorTest', () => {
             deathDate: null,
             biography: 'British author, best known for the Harry Potter series.'
         };
-        const author = new AuthorTest(data);
+        const author = new Author(data);
 
         const errors = author.validate();
         expect(errors).toEqual([]); // Validation réussie, aucune erreur
@@ -40,7 +40,7 @@ describe('Modèle AuthorTest', () => {
             deathDate: null,
             biography: 'British author, best known for the Harry Potter series.'
         };
-        const author = new AuthorTest(data);
+        const author = new Author(data);
 
         const json = author.toJson();
         expect(json).toEqual({
@@ -60,7 +60,7 @@ describe('Modèle AuthorTest', () => {
             deathDate: '2023-12-31', // Une date de décès valide, après la date de naissance
             biography: 'British author, best known for the Harry Potter series.'
         };
-        const author = new AuthorTest(data);
+        const author = new Author(data);
 
         const errors = author.validate();
         expect(errors).toEqual([]); // Validation réussie, aucune erreur
