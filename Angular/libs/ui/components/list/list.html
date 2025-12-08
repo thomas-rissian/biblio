@@ -1,0 +1,39 @@
+<div class="lib-list bg-white rounded-md shadow-sm overflow-hidden pb-24">
+  <div class="list-header flex items-center justify-between px-4 py-3 border-b" *ngIf="title || showControls">
+    <h3 class="text-lg font-medium text-gray-800" *ngIf="title">{{ title }}</h3>
+
+    <div class="list-controls flex items-center space-x-4" *ngIf="showControls">
+      <label class="text-sm text-gray-600 flex items-center">
+        <span class="mr-2">Items par page:</span>
+        <select class="form-select block w-24 px-2 py-1 border rounded bg-white text-sm" [value]="pageSize" (change)="setPageSize($any($event.target).valueAsNumber)">
+          <option *ngFor="let s of pageSizeOptions" [value]="s">{{ s }}</option>
+        </select>
+      </label>
+
+      <div class="page-info text-sm text-gray-600">
+        <span *ngIf="serverSide && totalCount === undefined && totalItems > 0">Page {{ page }} — {{ paginatedItems.length }} items</span>
+        <span *ngIf="serverSide && totalCount !== undefined"> {{ (page - 1) * pageSize + 1 }} - {{ Math.min(page * pageSize, totalItems) }} / {{ totalItems }}</span>
+        <span *ngIf="!serverSide && totalItems > 0">{{ (page - 1) * pageSize + 1 }} - {{ Math.min(page * pageSize, totalItems) }} / {{ totalItems }}</span>
+      </div>
+    </div>
+  </div>
+
+  <ul class="list-items divide-y" *ngIf="paginatedItems && paginatedItems.length > 0; else emptyList">
+    <li *ngFor="let item of paginatedItems; let i = index; trackBy: trackByFn">
+      <app-list-item [item]="item" [index]="i" [globalIndex]="(page - 1) * pageSize + i" [itemKey]="itemKey" (edit)="edit($event)" (remove)="remove($event)" (detail)="detail($event)"></app-list-item>
+    </li>
+  </ul>
+
+  <ng-template #emptyList>
+    <div class="no-data px-4 py-6 text-center text-sm text-gray-500">{{ noDataMessage }}</div>
+  </ng-template>
+
+  <app-list-pagination *ngIf="showControls" [page]="page" [pageSize]="pageSize" [totalItems]="totalItems" [isLastPage]="isLastPage" [serverSide]="serverSide" (pageChange)="goToPage($event.page)"></app-list-pagination>
+
+  <ng-container *ngIf="!serverSide || (serverSide && totalCount !== undefined)">
+    <ng-container *ngFor="let p of [].constructor(totalPages); let idx = index">
+      <button type="button" class="px-2 py-1 rounded hover:bg-gray-50" [class.bg-gray-100]="page === (idx + 1)" (click)="goToPage(idx + 1)">{{ idx + 1 }}</button>
+    </ng-container>
+  </ng-container>
+
+</div>

@@ -1,0 +1,21 @@
+<div class="p-4">
+  <div class="mb-4">
+    <button class="px-3 py-1 bg-green-600 text-white rounded" (click)="goToCreate()">Créer</button>
+  </div>
+  <app-list
+    [title]="'Books'"
+    [itemKey]="'title'"
+    [list]="books"
+    [serverSide]="true"
+    [pageSize]="pageSize"
+    [page]="page"
+    [totalCount]="totalCount"
+    [showControls]="true"
+    (pageChange)="onPageChange($event)"
+    (editMode)="onEdit($event)"
+    (detailMode)="onDetail($event)"
+    (removeMode)="onRemove($event)">
+  </app-list>
+  <app-loader/>
+  <div *ngIf="error" class="mt-4 text-sm text-red-600">{{ error }}</div>
+</div>

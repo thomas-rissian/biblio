@@ -35,14 +35,23 @@ class AuthorDAO {
      * @returns {Promise<Array>} Liste des auteurs
      * @throws {AppError} Si une erreur se produit lors de la récupération
      */
-    async getAll() {
+    async getAll({ page, pageSize } = {}) {
         try {
-            const authors = await prisma.author.findMany();
-            return authors.map(author => ({
+            // The controller is responsible for parsing/validating page & pageSize.
+            // If page and pageSize are provided (numbers), use them for pagination.
+            const findOptions = { orderBy: { id: 'asc' } };
+            if (typeof page === 'number' && typeof pageSize === 'number') {
+                const skip = (page - 1) * pageSize;
+                findOptions.skip = skip;
+                findOptions.take = pageSize;
+            }
+            const authors = await prisma.author.findMany(findOptions);
+            const items = authors.map(author => ({
                 ...author,
                 birthDate: formatDate(author.birthDate),
                 deathDate: formatDate(author.deathDate),
             }));
+            return items;
         } catch (error) {
             this.handlePrismaError(error, 'Erreur lors de la récupération des auteurs.');
         }

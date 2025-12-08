@@ -14,7 +14,30 @@ const handleRequest = async (req, res, callback) => {
 
 const getAllCategories = async (req, res) =>
     handleRequest(req, res, async (req, res) => {
-        const categories = await categoryDAO.getAll();
+        const DEFAULT_PAGE = 1;
+        const DEFAULT_PAGE_SIZE = 10;
+        const MAX_PAGE_SIZE = 100;
+        let { page, pageSize } = req.query;
+        // Set defaults when is not provided
+        if (page === undefined) {
+            page = DEFAULT_PAGE;
+        }
+        if (pageSize === undefined) {
+            pageSize = DEFAULT_PAGE_SIZE;
+        }
+        if (page !== undefined) {
+            page = parseInt(page);
+            if (isNaN(page) || page < 1) {
+                throw new AppError('Paramètre `page` invalide', 400);
+            }
+        }
+        if (pageSize !== undefined) {
+            pageSize = parseInt(pageSize);
+            if (isNaN(pageSize) || pageSize < 1 ) {
+                throw new AppError('Paramètre `pageSize` invalide (1 - ' + MAX_PAGE_SIZE + ')', 400);
+            }
+        }
+        const categories = await categoryDAO.getAll({ page: Number(page), pageSize: Number(pageSize) });
         res.status(200).json(categories);
     });
 

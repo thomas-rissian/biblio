@@ -4,8 +4,18 @@ import Category from "../model/Category.js";
 import bookDAO from "./bookDAO.js";
 
 class CategoryDAO {
-    async getAll() {
-        return prisma.category.findMany();
+    async getAll({ page, pageSize } = {}) {
+        try {
+            const findOptions = { orderBy: { id: 'asc' } };
+            if (typeof page === 'number' && typeof pageSize === 'number') {
+                findOptions.skip = (page - 1) * pageSize;
+                findOptions.take = pageSize;
+            }
+            const categories = await prisma.category.findMany(findOptions);
+            return categories;
+        } catch (error) {
+            this.handlePrismaError(error, "Erreur lors de la récupération des catégories");
+        }
     }
 
     async getById(id) {

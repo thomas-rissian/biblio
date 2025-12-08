@@ -1,0 +1,13 @@
+<nav class="pagination fixed bottom-4 left-0 right-0 z-50 flex items-center justify-center px-4 py-3 space-x-2 bg-white shadow-md rounded" *ngIf="(serverSide || (!serverSide && totalPages > 1))">
+  <button type="button" class="px-2 py-1 rounded hover:bg-gray-50" (click)="goTo(1)" [disabled]="page === 1">⇤</button>
+  <button type="button" class="px-2 py-1 rounded hover:bg-gray-50" (click)="prev()" [disabled]="page === 1">Préc</button>
+
+  <ng-container *ngIf="totalItems !== undefined">
+    <ng-container *ngFor="let p of [].constructor(totalPages); let idx = index">
+      <button type="button" class="px-2 py-1 rounded hover:bg-gray-50" [class.bg-gray-100]="page === (idx + 1)" (click)="goTo(idx + 1)">{{ idx + 1 }}</button>
+    </ng-container>
+  </ng-container>
+
+  <button type="button" class="px-2 py-1 rounded hover:bg-gray-50" (click)="next()" [disabled]="(isLastPage === true) || (totalItems !== undefined && page === totalPages)">Suiv</button>
+  <button *ngIf="totalItems !== undefined" type="button" class="px-2 py-1 rounded hover:bg-gray-50" (click)="goTo(totalPages)" [disabled]="page === totalPages">⇥</button>
+</nav>

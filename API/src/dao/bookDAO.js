@@ -13,9 +13,9 @@ class BookDAO {
      * @returns {Promise<Array>} Liste de livres
      * @throws {AppError} Si une erreur se produit lors de la récupération des livres
      */
-    async getAll() {
+    async getAll({ page, pageSize } = {}) {
         try {
-            const books = await prisma.book.findMany({
+            const findOptions = {
                 include: {
                     author: {
                         select: {
@@ -24,12 +24,19 @@ class BookDAO {
                         },
                     },
                     categories: true
-                }
-            });
-            return books.map(book => ({
+                },
+                orderBy: { id: 'asc' }
+            };
+            if (typeof page === 'number' && typeof pageSize === 'number') {
+                findOptions.skip = (page - 1) * pageSize;
+                findOptions.take = pageSize;
+            }
+            const books = await prisma.book.findMany(findOptions);
+            const items = books.map(book => ({
                 ...book,
                 publicationDate: formatDate(book.publicationDate)
             }));
+            return items;
         } catch (error) {
             this.handlePrismaError(error, 'Erreur lors de la récupération des livres');
         }

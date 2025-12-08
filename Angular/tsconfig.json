@@ -20,8 +20,9 @@
       "@biblio-app/": ["./apps/biblio-app/src/app/"],
       "@biblio-app/components/*": ["./apps/biblio-app/src/app/components/*"],
       "@biblio-app/core/*": ["./apps/biblio-app/src/app/core/*"],
-      "@biblio-app/models/*": ["./apps/biblio-app/src/app/models/*"],
-      "@biblio-app/pages/*": ["./apps/biblio-app/src/app/pages/*"]
+      "@biblio-app/models/*": ["./apps/biblio-app/src/app/model/*"],
+      "@biblio-app/pages/*": ["./apps/biblio-app/src/app/pages/*"],
+      "@biblio-app/core/services/*": ["./apps/biblio-app/src/app/services/*"]
     }
   },
   "angularCompilerOptions": {

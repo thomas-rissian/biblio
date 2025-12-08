@@ -1,0 +1,19 @@
+<label class="block text-sm text-gray-600">
+  <span class="block text-sm font-medium text-gray-700">{{ title }}</span>
+  <div class="mt-1 space-y-1">
+    <ng-container *ngIf="data.length; else none">
+      <label *ngFor="let item of data" class="inline-flex items-center space-x-2 w-full">
+        <input
+          type="checkbox"
+          [disabled]="disabled"
+          [checked]="isSelected(item[paramId])"
+          (change)="toggle(item[paramId], $any($event.target).checked)"
+        />
+        <span class="text-sm">{{ item[paramLabel] }}</span>
+      </label>
+    </ng-container>
+    <ng-template #none>
+      <div class="text-sm text-gray-500">Aucune catégorie</div>
+    </ng-template>
+  </div>
+</label>

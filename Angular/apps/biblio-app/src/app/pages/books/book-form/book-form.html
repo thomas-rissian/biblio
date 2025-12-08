@@ -1,0 +1,23 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4 bg-white p-4 rounded shadow">
+  <div class="grid grid-cols-2 gap-4">
+    <app-text-field formControlName="title" title="Titre" placeholder="Titre" type="text"></app-text-field>
+    <!-- Use the single author selector with form control value accessor -->
+    <app-author-select formControlName="authorId" [externalAuthors]="authors" title="Auteur"></app-author-select>
+  </div>
+  <div class="grid grid-cols-2 gap-4">
+    <app-text-field formControlName="publicationDate" title="Date de publication" type="date" placeholder="YYYY-MM-DD"></app-text-field>
+    <!-- Use a reusable multi-checkbox component for categories -->
+    <app-multi-checkbox formControlName="categoryIds" [data]="categories" title="Catégories" paramId="id" paramLabel="name"></app-multi-checkbox>
+  </div>
+
+  <app-text-area-field formControlName="description" title="Description" placeholder="Résumé"></app-text-area-field>
+
+  <div class="flex items-center space-x-2 justify-between">
+    <div>
+      <button type="submit" class="px-3 py-1 bg-blue-600 text-white rounded">Enregistrer</button>
+      <button type="button" class="px-3 py-1 bg-gray-100 ml-2 rounded" (click)="onCancel()">Annuler</button>
+    </div>
+    <div class="text-sm text-gray-500">Tous les champs sont requis</div>
+  </div>
+  <div *ngIf="error" class="mt-2 text-red-600 text-sm">{{ error }}</div>
+</form>

@@ -1,0 +1,12 @@
+<label class="block text-sm text-gray-600">
+  <span class="block text-sm font-medium text-gray-700">{{ title }}</span>
+  <ng-container *ngIf="!readonly; else detailTpl">
+    <select [disabled]="disabled" class="form-select block w-full px-2 py-1 border rounded bg-white text-sm" [(ngModel)]="selectedId" (ngModelChange)="onSelectChange($event)">
+      <option value="">Sélectionner...</option>
+      <option *ngFor="let a of authors" [ngValue]="a.id">{{ a.name }}</option>
+    </select>
+  </ng-container>
+  <ng-template #detailTpl>
+    <div class="p-2 text-sm text-gray-700">{{ selectedAuthorName ?? '—' }}</div>
+  </ng-template>
+</label>

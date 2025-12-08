@@ -1,5 +1,6 @@
 import authorDAO from '../dao/authorDAO.js';
 import Author from '../model/Author.js';
+import AppError from '../model/AppError.js';
 
 const handleRequest = async (req, res, callback) => {
     try {
@@ -12,7 +13,32 @@ const handleRequest = async (req, res, callback) => {
 };
 
 const getAllAuthors = async (req, res) => handleRequest(req, res, async() => {
-        const authors = await authorDAO.getAll();
+        const DEFAULT_PAGE = 1;
+        const DEFAULT_PAGE_SIZE = 10;
+        const MAX_PAGE_SIZE = 100;
+        let { page, pageSize } = req.query;
+        // If the client didn't provide pagination, default to defaults
+        // Set defaults when not provided
+        if (page === undefined) {
+            page = DEFAULT_PAGE;
+        }
+        if (pageSize === undefined) {
+            pageSize = DEFAULT_PAGE_SIZE;
+        }
+        // If provided parse and validate
+        if (page !== undefined) {
+            page = parseInt(page);
+            if (isNaN(page) || page < 1) {
+                throw new AppError('Paramètre `page` invalide', 400);
+            }
+        }
+        if (pageSize !== undefined) {
+            pageSize = parseInt(pageSize);
+            if (isNaN(pageSize) || pageSize < 1) {
+                throw new AppError('Paramètre `pageSize` invalide (1 - ' + MAX_PAGE_SIZE + ')', 400);
+            }
+        }
+        const authors = await authorDAO.getAll({ page: Number(page), pageSize: Number(pageSize) });
         res.status(200).json(authors);
 });
 
