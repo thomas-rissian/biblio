@@ -1,7 +1,7 @@
 import request from 'supertest';
+import app from '../../index.js';
 import { main as resetBdd } from "../../config/bddTest.js";
-const PORT = 3000;
-const URL = `http://localhost:${PORT}`;
+const agent = request(app);
 
 describe('Book API', () => {
     beforeEach(async () => {
@@ -9,14 +9,14 @@ describe('Book API', () => {
     });
 
     test('GET /books - Récupérer tous les livres', async () => {
-        const response = await request(URL).get('/books');
+        const response = await agent.get('/api/v1/books');
         expect(response.status).toBe(200);
         expect(response.body).toBeInstanceOf(Array);
         expect(response.body).toHaveLength(4);
     });
 
     test('GET /books/:id - Récupérer un livre existant', async () => {
-        const response = await request(URL).get('/books/1');
+        const response = await agent.get('/api/v1/books/1');
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
             id: 1,
@@ -30,7 +30,7 @@ describe('Book API', () => {
     });
 
     test('GET /books/:id - Récupérer un livre inexistant', async () => {
-        const response = await request(URL).get('/books/99');
+        const response = await agent.get('/api/v1/books/99');
         expect(response.status).toBe(404);
     });
 
@@ -42,7 +42,7 @@ describe('Book API', () => {
             authorId: 1,
             categoryIds: [1, 2]
         };
-        const response = await request(URL).post('/books').send(newBook);
+        const response = await agent.post('/api/v1/books').send(newBook);
         expect(response.status).toBe(201);
         expect(response.body.title).toBe(newBook.title);
     });
@@ -55,7 +55,7 @@ describe('Book API', () => {
             authorId: 1,
             categoryIds: [1, 2]
         };
-        const response = await request(URL).post('/books').send(invalidBook);
+        const response = await agent.post('/api/v1/books').send(invalidBook);
         expect(response.status).toBe(400);
     });
 
@@ -67,7 +67,7 @@ describe('Book API', () => {
             authorId: 1,
             categoryIds: [1]
         };
-        const response = await request(URL).put('/books/1').send(updatedBook);
+        const response = await agent.put('/api/v1/books/1').send(updatedBook);
         expect(response.status).toBe(200);
         expect(response.body.title).toBe(updatedBook.title);
     });
@@ -80,27 +80,27 @@ describe('Book API', () => {
             authorId: 1,
             categoryIds: [1]
         };
-        const response = await request(URL).put('/books/99').send(updatedBook);
+        const response = await agent.put('/api/v1/books/99').send(updatedBook);
         expect(response.status).toBe(404);
     });
 
     test('DELETE /books/:id - Supprimer un livre existant', async () => {
-        const response = await request(URL).delete('/books/2');
+        const response = await agent.delete('/api/v1/books/2');
         expect(response.status).toBe(200);
     });
 
     test('DELETE /books/:id - Supprimer un livre inexistant', async () => {
-        const response = await request(URL).delete('/books/99');
+        const response = await agent.delete('/api/v1/books/99');
         expect(response.status).toBe(404);
     });
 
     test('DELETE /books/author/:authorId - Supprimer les livres par auteur', async () => {
-        const response = await request(URL).delete('/books/author/2');
+        const response = await agent.delete('/api/v1/books/author/2');
         expect(response.status).toBe(200);
     });
 
     test('DELETE /books/categories/:categoryId - Supprimer les livres par catégorie', async () => {
-        const response = await request(URL).delete('/books/categories/3');
+        const response = await agent.delete('/api/v1/books/categories/3');
         expect(response.status).toBe(200);
     });
 });

@@ -1,105 +1,137 @@
 import { prisma } from '../lib/prisma.js'
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
 
 async function main() {
 
     await prisma.$connect();
 
-    // Supprimer les données existantes pour éviter les conflits
-    await prisma.book.deleteMany({});
-    await prisma.author.deleteMany({});
-    await prisma.category.deleteMany({});
+    // Supprimer proprement toutes les données et reinitialiser les sequences
+    // Utilise TRUNCATE pour s'assurer que tous les liens sont supprimés (y compris la table de jointure)
+    try {
+        // Log existing tables to ensure delete uses correct names
+        try {
+            const tables = await prisma.$queryRawUnsafe("SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname='public'");
+            console.log('[bddTest] Tables in DB:', tables.map(t => t.tablename));
+        } catch (e) {
+            console.warn('[bddTest] Could not list tables:', e.message);
+        }
 
-
-    // Création des catégories avec des IDs fixes
-    const categories = await prisma.category.createMany({
-        data: [
-            { id: 1, name: 'Fantasy' },
-            { id: 2, name: 'Dystopian' },
-            { id: 3, name: 'Romance' },
-            { id: 4, name: 'Classic Literature' },
-        ],
-        skipDuplicates: true,
-    });
-
-    // Création des auteurs avec des IDs fixes
-    const authors = await prisma.author.createMany({
-        data: [
-            { id: 1, name: 'J.K. Rowling', birthDate: new Date('1965-07-31'), biography: 'British author, best known for the Harry Potter series.' },
-            { id: 2, name: 'George Orwell', birthDate: new Date('1903-06-25'), deathDate: new Date('1950-01-21'), biography: 'English novelist and essayist, known for "1984" and "Animal Farm".' },
-            { id: 3, name: 'Jane Austen', birthDate: new Date('1775-12-16'), deathDate: new Date('1817-07-18'), biography: 'English novelist known for "Pride and Prejudice".' },
-        ],
-        skipDuplicates: true,
-    });
-
-    // Création des livres avec des IDs fixes
-    await prisma.book.createMany({
-        data: [
-            {
-                id: 1,
-                title: "Harry Potter and the Philosopher's Stone",
-                description: 'A young wizard embarks on his journey.',
-                publicationDate: new Date('1997-06-26'),
-                authorId: 1,
-            },
-            {
-                id: 2,
-                title: '1984',
-                description: 'A dystopian novel set in a totalitarian society.',
-                publicationDate: new Date('1949-06-08'),
-                authorId: 2,
-            },
-            {
-                id: 3,
-                title: 'Pride and Prejudice',
-                description: 'A classic romance novel.',
-                publicationDate: new Date('1813-01-28'),
-                authorId: 3,
-            },
-            {
-                id: 4,
-                title: 'Animal Farm',
-                description: 'A satirical novella about farm animals overthrowing their owner.',
-                publicationDate: new Date('1945-08-17'),
-                authorId: 2,
-            },
-        ],
-        skipDuplicates: true,
-    });
-
-    // Ajout des relations entre livres et catégories après création
-    const category1 = await prisma.category.findUnique({ where: { id: 1 } });
-    const category2 = await prisma.category.findUnique({ where: { id: 2 } });
-    const category3 = await prisma.category.findUnique({ where: { id: 3 } });
-    const category4 = await prisma.category.findUnique({ where: { id: 4 } });
-
-    // Vérifie si les catégories existent avant de les connecter
-    if (category1 && category2 && category3 && category4) {
-        await prisma.book.update({
-            where: { id: 1 },
-            data: { categories: { connect: [{ id: 1 }] } },
-        });
-
-        await prisma.book.update({
-            where: { id: 2 },
-            data: { categories: { connect: [{ id: 2 }, { id: 4 }] } },
-        });
-
-        await prisma.book.update({
-            where: { id: 3 },
-            data: { categories: { connect: [{ id: 3 }] } },
-        });
-
-        await prisma.book.update({
-            where: { id: 4 },
-            data: { categories: { connect: [{ id: 4 }] } },
-        });
-    } else {
-        console.log("Une ou plusieurs catégories manquent");
+            // Retry TRUNCATE a few times in case of transient deadlocks
+            const maxRetries = 3;
+            let truncated = false;
+            for (let attempt = 1; attempt <= maxRetries && !truncated; attempt++) {
+                try {
+                    await prisma.$executeRawUnsafe('TRUNCATE TABLE "_BookCategories", "Book", "Author", "Category" RESTART IDENTITY CASCADE');
+                    console.log('[bddTest] Tables truncated (RESTART IDENTITY CASCADE)');
+                    truncated = true;
+                } catch (e) {
+                    console.warn(`[bddTest] TRUNCATE attempt ${attempt} failed: ${e.message}`);
+                    if (attempt < maxRetries) {
+                        // Small delay before retry
+                        await new Promise((r) => setTimeout(r, 200));
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+        // Log counts after delete
+        const bCountAfterTruncate = await prisma.book.count();
+        const aCountAfterTruncate = await prisma.author.count();
+        const cCountAfterTruncate = await prisma.category.count();
+        console.log(`[bddTest] Counts after clear - books: ${bCountAfterTruncate}, authors: ${aCountAfterTruncate}, categories: ${cCountAfterTruncate}`);
+    } catch (err) {
+        console.error('[bddTest] Error clearing tables:', err.message);
     }
 
-    console.log('Database has been seeded successfully!');
+
+    // Exécute toutes les créations dans une transaction pour garantir l'atomicité
+    try {
+        await prisma.$transaction(async (tx) => {
+            // Création des catégories (sans IDs fixes pour éviter les conflits avec l'autoincrément)
+            await tx.category.createMany({
+                data: [
+                    { name: 'Fantasy' },
+                    { name: 'Dystopian' },
+                    { name: 'Romance' },
+                    { name: 'Classic Literature' },
+                ],
+                skipDuplicates: true,
+            });
+
+            // Création des auteurs (sans IDs fixes)
+            const author1 = await tx.author.create({ data: { name: 'J.K. Rowling', birthDate: new Date('1965-07-31'), biography: 'British author, best known for the Harry Potter series.' } });
+            const author2 = await tx.author.create({ data: { name: 'George Orwell', birthDate: new Date('1903-06-25'), deathDate: new Date('1950-01-21'), biography: 'English novelist and essayist, known for "1984" and "Animal Farm".' } });
+            const author3 = await tx.author.create({ data: { name: 'Jane Austen', birthDate: new Date('1775-12-16'), deathDate: new Date('1817-07-18'), biography: 'English novelist known for "Pride and Prejudice".' } });
+
+            // Création des livres en se basant sur les auteurs créés ci-dessus
+            const book1 = await tx.book.create({ data: { title: "Harry Potter and the Philosopher's Stone", description: 'A young wizard embarks on his journey.', publicationDate: new Date('1997-06-26'), authorId: author1.id } });
+            const book2 = await tx.book.create({ data: { title: '1984', description: 'A dystopian novel set in a totalitarian society.', publicationDate: new Date('1949-06-08'), authorId: author2.id } });
+            const book3 = await tx.book.create({ data: { title: 'Pride and Prejudice', description: 'A classic romance novel.', publicationDate: new Date('1813-01-28'), authorId: author3.id } });
+            const book4 = await tx.book.create({ data: { title: 'Animal Farm', description: 'A satirical novella about farm animals overthrowing their owner.', publicationDate: new Date('1945-08-17'), authorId: author2.id } });
+
+            // Récupère les catégories fraîchement créées (dans la transaction)
+            const catFantasy = await tx.category.findUnique({ where: { name: 'Fantasy' } });
+            const catDystopian = await tx.category.findUnique({ where: { name: 'Dystopian' } });
+            const catRomance = await tx.category.findUnique({ where: { name: 'Romance' } });
+            const catClassic = await tx.category.findUnique({ where: { name: 'Classic Literature' } });
+
+            if (!(catFantasy && catDystopian && catRomance && catClassic)) {
+                throw new Error('Categories not found during seeding');
+            }
+
+            // Connecte les catégories aux livres
+            await tx.book.update({ where: { id: book1.id }, data: { categories: { connect: [{ id: catFantasy.id }] } } });
+            await tx.book.update({ where: { id: book2.id }, data: { categories: { connect: [{ id: catDystopian.id }, { id: catClassic.id }] } } });
+            await tx.book.update({ where: { id: book3.id }, data: { categories: { connect: [{ id: catRomance.id }] } } });
+            await tx.book.update({ where: { id: book4.id }, data: { categories: { connect: [{ id: catClassic.id }] } } });
+        });
+    } catch (err) {
+        console.error('[bddTest] Error while seeding (transaction rolled back):', err.message);
+        // Re-throw so tests fail intentionally and don't continue with inconsistent state
+        throw err;
+    }
+
+    // (Les relations entre livres et catégories sont gérées dans la transaction ci-dessus)
+
+    // Log counts after seeding and assert expected expected counts
+    const bCountAfterSeed = await prisma.book.count();
+    const aCountAfterSeed = await prisma.author.count();
+    const cCountAfterSeed = await prisma.category.count();
+    console.log(`[bddTest] Counts after seed - books: ${bCountAfterSeed}, authors: ${aCountAfterSeed}, categories: ${cCountAfterSeed}`);
+
+    const expectedBooks = 4;
+    const expectedAuthors = 3;
+    const expectedCategories = 4;
+
+    if (bCountAfterSeed !== expectedBooks || aCountAfterSeed !== expectedAuthors || cCountAfterSeed !== expectedCategories) {
+        throw new Error(`[bddTest] Seed counts mismatch - got books:${bCountAfterSeed}, authors:${aCountAfterSeed}, categories:${cCountAfterSeed}`);
+    }
 };
+
+// If run directly with node ./config/bddTest.js, execute main() and disconnect afterward
+const __filename = fileURLToPath(import.meta.url);
+if (process.argv[1] === __filename) {
+    main()
+        .then(async () => {
+            try {
+                await prisma.$disconnect();
+            } catch (e) {
+                console.error('[bddTest] Error disconnecting prisma:', e.message);
+            }
+            console.log('[bddTest] CLI seed finished');
+        })
+        .catch(async (err) => {
+            console.error('[bddTest] Seed failed via CLI:', err.message);
+            try {
+                await prisma.$disconnect();
+            } catch (e) {
+                console.error('[bddTest] Error disconnecting prisma after failure:', e.message);
+            }
+            process.exit(1);
+        });
+}
 
 export { main };

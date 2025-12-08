@@ -22,9 +22,9 @@ app.use((req, res, next) => {
 });
 
 // Mount routers
-app.use('/books', bookRouter);
-app.use('/authors', authorRouter);
-app.use('/categories', categoryRouter);
+app.use('/api/v1/books', bookRouter);
+app.use('/api/v1/authors', authorRouter);
+app.use('/api/v1/categories', categoryRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);
@@ -35,11 +35,19 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+let server;
+if (process.env.NODE_ENV !== 'test') {
+  server = app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}/api/v1`);
+  });
+}
 
 process.on('SIGINT', async () => {
   await prisma.$disconnect();
+  if (server) {
+    server.close();
+  }
   process.exit(0);
 });
+
+export default app;
