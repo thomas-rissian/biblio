@@ -37,7 +37,7 @@ Générer Prisma Client:
 npx prisma generate
 ```
 
-Lancer un script de test:
+Lancer un bdd de test:
 ```bash
 npm run bdd
 ```
@@ -73,7 +73,16 @@ npx prisma studio --config ./prisma.config.js
 
 ``` 
 
+## Test
+
+Executer les test d'intégrations 
+```bash
+npm run test
+```
+
 ## Documentation
 
 - [Prisma ORM](https://www.prisma.io/docs/orm)
 - [Prisma Postgres](https://www.prisma.io/docs/postgres)
+
+
