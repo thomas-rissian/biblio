@@ -1,6 +1,7 @@
 # Projet API Prisma
 
-Un projet API utilisant Prisma ORM avec PostgreSQL.
+Un projet API utilisant Prisma ORM (v7) avec PostgreSQL.
+Migrer sous express.js ! 
 
 ## Installation
 
@@ -38,7 +39,7 @@ npx prisma generate
 
 Lancer un script de test:
 ```bash
-node script.js
+npm run bdd
 ```
 
 ## Studio Prisma
@@ -51,17 +52,26 @@ npx prisma studio --config ./prisma.config.js
 ## Structure du projet
 
 ```
+├── index.js               # Point d'entrée Express
+├── config/
+│   └── bddTest.js         # Scripts de démarrage / tests (ex: bddTest)
+├── src/                   # Code applicatif
+│   ├── controller/        # Controllers (authorController.js, bookController.js, ...)
+│   ├── dao/               # Data Access Objects (authorDAO.js, ...) : accès bdd
+│   ├── model/             # Modèles métier (Author.js, Book.js, Category.js, AppError.js, ...)
+│   └── route/             # Routes / routers (authorRouter.js, ...)
 ├── lib/
 │   └── prisma.js          # Instance Prisma Client
 ├── prisma/
 │   ├── schema.prisma      # Modèles de données
 │   └── migrations/        # Historique des migrations
+├── test/                  # Tests unitaires et d'intégration
 ├── .env.example           # Template des variables d'environnement
 ├── .gitignore
 ├── package.json
 ├── prisma.config.js       # Configuration Prisma
-└── script.js              # Script de test
-```
+
+``` 
 
 ## Documentation
 

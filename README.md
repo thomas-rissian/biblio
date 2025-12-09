@@ -6,7 +6,10 @@ Bienvenue sur **Biblio**, une plateforme dédiée à la gestion et à la consult
 Ce projet repose sur une architecture composée de deux serveurs distincts :
 
 - **API Biblio** : Un serveur backend permettant d'effectuer des opérations CRUD (Créer, Lire, Mettre à jour, Supprimer) sur une base de données. Il gère les livres, auteurs et catégories de manière efficace et flexible.
-- **Serveur Web** : Un frontend moderne construit avec le framework Vue.js, qui exploite l'API Biblio pour offrir une interface utilisateur intuitive et performante.
+
+[FRONTEND]
+- **Vue** : Un frontend moderne construit avec le framework Vue.js, qui exploite l'API Biblio
+- **Angular** : Un frontend moderne construit avec le framework Angular, qui exploite l'API Biblio
 
 Cette séparation des responsabilités entre l'API et le serveur web garantit une architecture modulaire, facilitant l'évolutivité et l'intégration avec d'autres systèmes.
 
@@ -16,8 +19,9 @@ Cette séparation des responsabilités entre l'API et le serveur web garantit un
 
 ### Ports par défaut
 
-- **API Biblio** : Accessible sur le **port 40000**.
-- **Serveur Web** : Accessible sur le **port 5173**.
+- **API Biblio** : Accessible sur le **port 3000**.
+- **Serveur Vue** : Accessible sur le **port 5173**.
+- **Serveur Angular** : Accessible sur le **port 4200**.
 
 Le port de l'API peut-être modifier dans le fichier index.js
 
