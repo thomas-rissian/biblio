@@ -40,6 +40,16 @@ npx prisma generate
 Lancer un bdd de test:
 ```bash
 npm run bdd
+
+```
+Démarer serveur prod: 
+```bash
+npm run start
+
+```
+Démarer serveur dev: 
+```bash
+npm run dev
 ```
 
 ## Studio Prisma

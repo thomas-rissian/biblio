@@ -37,6 +37,7 @@ app.use((req, res) => {
 let server;
 if (process.env.NODE_ENV !== 'test') {
   server = app.listen(PORT, () => {});
+  console.log(`Server is running on port http://localhost:${PORT}`);
 }
 
 process.on('SIGINT', async () => {
