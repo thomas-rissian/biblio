@@ -9,8 +9,8 @@
     "migrate": "prisma migrate dev",
     "generate": "prisma generate",
     "bdd": "node ./config/bddTest.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand"
-
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
+    "reinstall": "npm ci"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +28,16 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "pg": "^8.16.3"
+  },
+  "overrides": {
+    "glob": "^9.3.0"
+  },
+  "resolutions": {
+    "glob": "^9.3.0"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   },
   "jest": {
     "testEnvironment": "node",
