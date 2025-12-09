@@ -14,6 +14,10 @@ Ce projet repose sur une architecture composée de deux serveurs distincts :
 Cette séparation des responsabilités entre l'API et le serveur web garantit une architecture modulaire, facilitant l'évolutivité et l'intégration avec d'autres systèmes.
 
 ---
+## Setup necessaire 
+
+node.js >= 18
+Bdd Postgresql
 
 ## Configuration
 
