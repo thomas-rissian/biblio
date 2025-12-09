@@ -1,18 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LibList as List } from '../../../../../../../libs/ui/components/list/list';
+import { LibList as List } from '@libs/ui/components/list/list';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, lastValueFrom } from 'rxjs';
-import { BookModel } from '../../../model';
 import { AuthorsService } from '@biblio-app/core/service/author.service';
 import { CategoriesService } from '@biblio-app/core/service/categorie.service';
-import { AuthorModel, CategoryModel } from '../../../model';
 import { BooksService } from '@biblio-app/core/service/book.service';
 import { Loader } from '@libs/ui/loader/loader';
 import { AuthorSelect } from '@biblio-app/components/author-select/author-select';
 import { CategorySelect } from '@biblio-app/components/category-select/category-select';
 import { TextField } from '@libs/ui/inputs/textField/textField';
 import { Router } from '@angular/router';
+import { BookModel } from '@biblio-app/models/book.model';
+import { AuthorModel } from '@biblio-app/models/author.model';
+import { CategoryModel } from '@biblio-app/models/category.model';
 
 @Component({
   selector: 'app-list-books',

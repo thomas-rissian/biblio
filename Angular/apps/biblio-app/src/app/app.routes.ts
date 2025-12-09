@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'books', pathMatch: 'full' },
-  { path: 'home', redirectTo: 'books', pathMatch: 'full' },
   { path: 'books/create', loadComponent: () => import('./pages/books/book-form/book-form').then(m => m.BookForm) },
   
   { path: 'books/:id/edit', loadComponent: () => import('./pages/books/book-form/book-form').then(m => m.BookForm) },

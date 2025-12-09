@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { LibList as List } from '../../../../../../../libs/ui/components/list/list';
+import { LibList as List } from '@libs/ui/components/list/list';
 import { TextField } from '@libs/ui/inputs/textField/textField';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { AuthorForm } from '../author-form/author-form';
 import { Subject, takeUntil, lastValueFrom } from 'rxjs';
-import { AuthorModel } from '../../../model';
 import { AuthorsService } from '@biblio-app/core/service/author.service';
 import { Loader } from '@libs/ui/loader/loader';
+import { AuthorForm } from '../author-form/author-form';
+import { AuthorModel } from '@biblio-app/models/author.model';
 
 @Component({
   selector: 'app-list-authors',

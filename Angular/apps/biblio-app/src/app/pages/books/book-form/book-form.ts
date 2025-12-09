@@ -12,7 +12,6 @@ import { AuthorSelect } from '@biblio-app/components/author-select/author-select
 import { MultiCheckbox } from '@libs/ui/inputs/multi-checkbox/multi-checkbox';
 import { TextAreaField } from '@libs/ui/inputs/textAreaField/textAreaField';
 import { TextField } from '@libs/ui/inputs/textField/textField';
-import { AuthorForm } from "@biblio-app/pages/authors/author-form/author-form";
 
 @Component({
   selector: 'app-book-form',

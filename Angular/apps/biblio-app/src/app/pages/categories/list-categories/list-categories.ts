@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { LibList as List } from '../../../../../../../libs/ui/components/list/list';
+import { LibList as List } from '@libs/ui/components/list/list';
 import { TextField } from '@libs/ui/inputs/textField/textField';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, lastValueFrom } from 'rxjs';
-import { CategoryModel } from '../../../model';
 import { CategoriesService } from '@biblio-app/core/service/categorie.service';
 import { Loader } from '@libs/ui/loader/loader';
+import { CategoryModel } from '@biblio-app/models/category.model';
 
 @Component({
   selector: 'app-list-categories',

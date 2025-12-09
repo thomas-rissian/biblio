@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TextField } from '../../../../../../../libs/ui/inputs/textField/textField';
+import { TextField } from '@libs/ui/inputs/textField/textField';
 import { CategoriesService } from '@biblio-app/core/service/categorie.service';
-import { CategoryModel } from '../../../model';
+import { CategoryModel } from '@biblio-app/models/category.model';
 
 @Component({
   selector: 'app-category-form',

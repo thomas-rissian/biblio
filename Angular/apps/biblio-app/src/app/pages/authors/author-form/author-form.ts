@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TextField } from '../../../../../../../libs/ui/inputs/textField/textField';
-import { TextAreaField } from '../../../../../../../libs/ui/inputs/textAreaField/textAreaField';
-import { AuthorModel } from '../../../model';
 import { AuthorsService } from '@biblio-app/core/service/author.service';
+import { TextField } from '@libs/ui/inputs/textField/textField';
+import { TextAreaField } from '@libs/ui/inputs/textAreaField/textAreaField';
+import { AuthorModel } from '@biblio-app/models/author.model';
 
 @Component({
   selector: 'app-author-form',

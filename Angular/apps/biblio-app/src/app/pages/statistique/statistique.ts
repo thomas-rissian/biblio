@@ -2,13 +2,13 @@ import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
-import { AuthorsService } from '../../core/service/author.service';
-import { BooksService } from '../../core/service/book.service';
-import { CategoriesService } from '../../core/service/categorie.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError, timeout, finalize } from 'rxjs/operators';
 import * as d3 from 'd3';
 import { Loader } from '@libs/ui/loader/loader';
+import { AuthorsService } from '@biblio-app/core/service/author.service';
+import { BooksService } from '@biblio-app/core/service/book.service';
+import { CategoriesService } from '@biblio-app/core/service/categorie.service';
 
 @Component({
   selector: 'app-statistique',

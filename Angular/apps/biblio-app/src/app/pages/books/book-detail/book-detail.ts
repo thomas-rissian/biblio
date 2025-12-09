@@ -8,8 +8,8 @@ import { BooksService } from '@biblio-app/core/service/book.service';
 import { timeout, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ChangeDetectorRef } from '@angular/core';
-import { AuthorCard } from '../../../../../../../libs/ui/components/author-card/author-card';
 import { BookModel } from '@biblio-app/models/index';
+import { AuthorCard } from '@biblio-app/components/author-card/author-card';
 
 @Component({
   selector: 'app-book-detail',

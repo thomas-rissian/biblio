@@ -9,8 +9,8 @@ import { Loader } from '@libs/ui/loader/loader';
 import { ViewChild } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { BooksService } from '@biblio-app/core/service/book.service';
-import { AuthorCard } from '../../../../../../../libs/ui/components/author-card/author-card';
 import { AuthorModel, BookModel } from '@biblio-app/models/index';
+import { AuthorCard } from '@biblio-app/components/author-card/author-card';
 
 @Component({
   selector: 'app-author-detail',
