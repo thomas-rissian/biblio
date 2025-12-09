@@ -16,9 +16,8 @@ Cette séparation des responsabilités entre l'API et le serveur web garantit un
 ---
 ## Setup necessaire 
 
-node.js >= 18
-
-Bdd Postgresql
+- node.js >= 18
+- Bdd Postgresql
 
 ## Configuration
 
