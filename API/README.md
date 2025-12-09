@@ -20,6 +20,11 @@ cp .env.example .env
 
 ## Migrations
 
+Reset bdd existante : 
+```bash 
+npx prisma migrate reset
+```
+
 Créer une migration:
 ```bash
 npx prisma migrate dev --name nom_de_la_migration
