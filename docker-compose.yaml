@@ -1,0 +1,107 @@
+services:
+  # PostgreSQL Database Service
+  postgres:
+    container_name: biblio-postgres
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: ${DB_NAME:-biblio}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    secrets:
+      - db_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./API/init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    networks:
+      - biblio-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Backend Service
+  api:
+    container_name: biblio-api
+    build:
+      context: ./API
+      dockerfile: Dockerfile
+    image: biblio-api:latest
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${API_PORT:-3001}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-postgres}
+      DB_NAME: ${DB_NAME:-biblio}
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-}@postgres:5432/${DB_NAME:-biblio}
+    secrets:
+      - db_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./API:/app
+      - /app/node_modules
+    ports:
+      - "${API_PORT:-3001}:3001"
+    networks:
+      - biblio-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/v1/books', (r) => {if (r.statusCode >= 400) throw new Error(r.statusCode)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # Angular Frontend Service
+  angular:
+    container_name: biblio-angular
+    build:
+      context: ./Angular
+      dockerfile: Dockerfile
+      args:
+        API_URL: ${API_URL}
+    image: biblio-angular:latest
+    depends_on:
+      - api
+    ports:
+      - "${ANGULAR_PORT:-4200}:4200"
+    networks:
+      - biblio-network
+    restart: unless-stopped
+
+  # Vue Frontend Service
+  vue:
+    container_name: biblio-vue
+    build:
+      context: ./Vue
+      dockerfile: Dockerfile
+      args:
+        API_URL: ${API_URL}
+    image: biblio-vue:latest
+    depends_on:
+      - api
+    ports:
+      - "5173:5173"
+    networks:
+      - biblio-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  biblio-network:
+    driver: bridge
+
+secrets:
+  db_password:
+    file: ./secrets/.db_password

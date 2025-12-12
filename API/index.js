@@ -5,7 +5,7 @@ import categoryRouter from './src/route/categoryRouter.js';
 import { prisma } from './lib/prisma.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(express.json());

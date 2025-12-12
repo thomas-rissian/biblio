@@ -37,3 +37,36 @@ Chaque serveur dispose de son propre fichier `README` situé dans son dossier ra
 - Démarrer
 
 Mais un guide d'installation et d'utilisation est disponible dans /doc.
+
+---
+
+## 🐳 Docker - Démarrage rapide
+
+### 1. Préparer les secrets
+```bash
+mkdir secrets
+echo "biblio_password_123" > secrets/.db_password
+```
+
+### 2. Copier la config
+```bash
+cp .env.example .env
+```
+
+### 3. Démarrer
+```powershell
+# Windows
+.\docker-start.ps1 start
+
+# Linux/macOS
+chmod +x docker-start.sh && ./docker-start.sh start
+```
+
+### 4. Accéder
+- **Frontend Angular**: http://localhost:4200
+- **Frontend Vue**: http://localhost:5173
+- **API**: http://localhost:3001/api/v1
+- **DB PostgreSQL**: localhost:5432
+
+**Secret BDD**: `secrets/.db_password` = `biblio_password_123`
+(réutiliser coté API)

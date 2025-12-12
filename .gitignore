@@ -29,6 +29,31 @@ frontend/.vite/
 .env.test.local
 .env.production.local
 
+# Docker secrets and passwords
+/secrets/
+.db_password
+
+# Docker volumes
+postgres_data/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+coverage/
+.nyc_output/
+
+# Angular specific
+.angular/
+
+# Prisma
+.prisma/
+
 # IDE/Editor specific files
 .vscode/
 .idea/
