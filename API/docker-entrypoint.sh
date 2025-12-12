@@ -29,13 +29,13 @@ while ! (echo > /dev/tcp/${DB_HOST}/${DB_PORT}) 2>/dev/null; do
 done
 echo "PostgreSQL is ready"
 
-# Run migrations
-echo "Running migrations..."
-npx prisma migrate deploy --schema ./prisma/schema.prisma
+# Push schema to database (creates tables if they don't exist)
+echo "Syncing database schema..."
+npx prisma db push --schema ./prisma/schema.prisma
 
 # Seed database
 echo "Seeding database..."
-node ./config/bddTest.js
+node ./config/bddTest.js || true
 
 echo "API ready!"
 echo "Starting server on port 3001..."
