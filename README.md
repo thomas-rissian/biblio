@@ -43,11 +43,17 @@ Mais un guide d'installation et d'utilisation est disponible dans /doc.
 ## 🐳 Docker - Démarrage rapide
 
 ### 1. Préparer les secrets
-```bash
+```powershell
+# Windows PowerShell
 mkdir secrets
-echo "biblio_password_123" > secrets/.db_password
+[System.IO.File]::WriteAllText("$PWD\secrets\db_password", "biblio_password_123", [System.Text.Encoding]::UTF8)
 ```
 
+```bash
+# Linux/macOS
+mkdir -p secrets
+echo -n "biblio_password_123" > secrets/db_password
+```
 ### 2. Copier la config
 ```bash
 cp .env.example .env
