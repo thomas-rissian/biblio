@@ -14,7 +14,8 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "preserve",
-    "baseUrl": ".",
+    "baseUrl": "./",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@libs/*": ["libs/*"],
       "@biblio-app/": ["./apps/biblio-app/src/app/"],

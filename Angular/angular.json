@@ -6,7 +6,6 @@
     "analytics": false
   },
   "newProjectRoot": "projects",
-  "defaultProject": "biblio-app",
   "projects": {
     "biblio-app": {
       "projectType": "application",
